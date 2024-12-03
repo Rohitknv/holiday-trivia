@@ -1,6 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Button, Grid, Card, CardContent, Fade, Slide } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { Box, Typography, Paper, Button, Grid, Card, CardContent, Fade, Slide, Chip } from '@mui/material';
+import { alpha, keyframes } from '@mui/material/styles';
+
+// Animation keyframes
+const correctAnswerBounce = keyframes`
+    0%, 100% { transform: translateY(0); }
+    20% { transform: translateY(-10px); }
+    40% { transform: translateY(0); }
+    60% { transform: translateY(-5px); }
+    80% { transform: translateY(0); }
+`;
+
+const incorrectAnswerShake = keyframes`
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+`;
 
 const QuestionDisplay = ({
     question,
@@ -14,13 +31,15 @@ const QuestionDisplay = ({
     const [selectedAnswers, setSelectedAnswers] = useState([]);
     const [teamOrder, setTeamOrder] = useState([]);
     const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
+    const [knockedOutTeams, setKnockedOutTeams] = useState(new Set());
 
-    // Only reset state when question changes
+    // Reset state including knocked out teams when question changes
     useEffect(() => {
         const sortedTeams = [...teams].sort((a, b) => b.score - a.score);
         setTeamOrder(sortedTeams);
         setCurrentTeamIndex(0);
         setSelectedAnswers([]);
+        setKnockedOutTeams(new Set());
     }, [question.id]);
 
     const currentTeam = teamOrder[currentTeamIndex];
@@ -46,13 +65,30 @@ const QuestionDisplay = ({
                     ? { ...team, score: team.score + answer.points }
                     : team
             ));
-        }
+        } else {
+            // Knock out current team
+            setKnockedOutTeams(prev => new Set([...prev, currentTeam.id]));
 
-        // Delay team transition slightly for visual feedback
-        setTimeout(() => {
-            const nextIndex = (currentTeamIndex + 1) % teamOrder.length;
-            setCurrentTeamIndex(nextIndex);
-        }, 500);
+            // Find next available team
+            const nextTeam = findNextAvailableTeam(currentTeamIndex);
+            if (nextTeam !== -1) {
+                setCurrentTeamIndex(nextTeam);
+            }
+        }
+    };
+
+    const findNextAvailableTeam = (currentIndex) => {
+        let nextIndex = (currentIndex + 1) % teamOrder.length;
+        const startIndex = nextIndex;
+
+        do {
+            if (!knockedOutTeams.has(teamOrder[nextIndex].id)) {
+                return nextIndex;
+            }
+            nextIndex = (nextIndex + 1) % teamOrder.length;
+        } while (nextIndex !== startIndex);
+
+        return -1; // All teams are knocked out
     };
 
     return (
@@ -76,11 +112,66 @@ const QuestionDisplay = ({
                 </Typography>
             </Paper>
 
+            {/* Knocked Out Teams Display */}
+            {knockedOutTeams.size > 0 && (
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    mb: 3,
+                    p: 1
+                }}>
+                    <Typography
+                        variant="subtitle2"
+                        color="error.main"
+                        sx={{
+                            fontWeight: 'medium',
+                            whiteSpace: 'nowrap'
+                        }}
+                    >
+                        Knocked Out:
+                    </Typography>
+                    <Box sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 1
+                    }}>
+                        {Array.from(knockedOutTeams).map(teamId => {
+                            const team = teams.find(t => t.id === teamId);
+                            return (
+                                <Chip
+                                    key={team.id}
+                                    label={team.name}
+                                    icon={
+                                        <span style={{
+                                            fontSize: '1.1em',
+                                            marginLeft: '8px'
+                                        }}>
+                                            {team.emoji}
+                                        </span>
+                                    }
+                                    sx={{
+                                        backgroundColor: alpha(team.color, 0.1),
+                                        border: `1px solid ${team.color}40`,
+                                        color: team.color,
+                                        fontWeight: 'medium',
+                                        '& .MuiChip-icon': {
+                                            color: 'inherit',
+                                            marginRight: '-4px'
+                                        }
+                                    }}
+                                />
+                            );
+                        })}
+                    </Box>
+                </Box>
+            )}
+
             {/* Current Team Display with Animation */}
-            <Box sx={{ height: 80, mb: 3 }}> {/* Fixed height container to prevent layout shift */}
-                <Fade in={true} key={currentTeam?.id}>
-                    <Slide direction="left" in={true}>
-                        {currentTeam ? (
+            {currentTeam && !knockedOutTeams.has(currentTeam.id) && (
+                <Box sx={{ height: 80, mb: 3 }}> {/* Fixed height container to prevent layout shift */}
+                    <Fade in={true} key={currentTeam?.id}>
+                        <Slide direction="left" in={true}>
                             <Paper
                                 elevation={2}
                                 sx={{
@@ -106,10 +197,10 @@ const QuestionDisplay = ({
                                     <span style={{ marginLeft: 1 }}>is picking</span>
                                 </Typography>
                             </Paper>
-                        ) : <Box />}
-                    </Slide>
-                </Fade>
-            </Box>
+                        </Slide>
+                    </Fade>
+                </Box>
+            )}
 
             {/* Answers Grid */}
             <Grid container spacing={2} sx={{ mb: 4 }}>
@@ -140,7 +231,14 @@ const QuestionDisplay = ({
                                     '&:hover': !isSelected && {
                                         transform: 'translateY(-4px)',
                                         boxShadow: 3
-                                    }
+                                    },
+                                    animation: isSelected ? (
+                                        isCorrectSelection
+                                            ? `${correctAnswerBounce} 0.8s ease`
+                                            : `${incorrectAnswerShake} 0.5s ease`
+                                    ) : 'none',
+                                    // Prevent hover animation during result animation
+                                    pointerEvents: isSelected ? 'none' : 'auto'
                                 }}
                                 onClick={() => !isSelected && handleAnswerSelect(answer)}
                             >
