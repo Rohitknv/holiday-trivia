@@ -239,23 +239,31 @@ const QuestionDisplay = ({
                                         isCorrectSelection
                                             ? alpha('#4caf50', 0.1)  // Light green background
                                             : alpha('#f44336', 0.1)  // Light red background
-                                    ) : 'background.paper',
+                                    ) : (
+                                        // Show all answers' correctness when question is complete
+                                        isQuestionComplete()
+                                            ? (answer.isCorrect
+                                                ? alpha('#4caf50', 0.1)  // Light green for correct
+                                                : alpha('#f44336', 0.1))  // Light red for incorrect
+                                            : 'background.paper'
+                                    ),
                                     borderLeft: isSelected ? (
                                         isCorrectSelection
                                             ? '4px solid #4caf50'    // Solid green border
                                             : '4px solid #f44336'    // Solid red border
-                                    ) : 'none',
-                                    '&:hover': !isSelected && {
+                                    ) : (
+                                        // Show all answers' borders when question is complete
+                                        isQuestionComplete()
+                                            ? (answer.isCorrect
+                                                ? '4px solid #4caf50'  // Green border for correct
+                                                : '4px solid #f44336')  // Red border for incorrect
+                                            : 'none'
+                                    ),
+                                    '&:hover': (!isSelected && !isQuestionComplete()) && {
                                         transform: 'translateY(-4px)',
                                         boxShadow: 3
                                     },
-                                    animation: isSelected ? (
-                                        isCorrectSelection
-                                            ? `${correctAnswerBounce} 0.8s ease`
-                                            : `${incorrectAnswerShake} 0.5s ease`
-                                    ) : 'none',
-                                    // Prevent hover animation during result animation
-                                    pointerEvents: isSelected ? 'none' : 'auto',
+                                    pointerEvents: (isSelected || isQuestionComplete()) ? 'none' : 'auto',
                                     // Adjust content sizing for smaller cards
                                     '& .MuiCardContent-root': {
                                         p: { xs: 2, md: 2.5 }, // Responsive padding
@@ -327,7 +335,14 @@ const QuestionDisplay = ({
                                                         isCorrectSelection
                                                             ? '#2e7d32'  // Darker green text
                                                             : '#d32f2f'  // Darker red text
-                                                    ) : 'text.primary',
+                                                    ) : (
+                                                        // Show all answers' text colors when question is complete
+                                                        isQuestionComplete()
+                                                            ? (answer.isCorrect
+                                                                ? '#2e7d32'  // Green text for correct
+                                                                : '#d32f2f')  // Red text for incorrect
+                                                            : 'text.primary'
+                                                    ),
                                                     fontSize: { xs: '1rem', md: '1.1rem' } // Responsive font size
                                                 }}
                                             >
