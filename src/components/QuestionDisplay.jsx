@@ -160,15 +160,20 @@ const QuestionDisplay = ({
                                     sx={{
                                         pt: 4,
                                         px: 3,
-                                        pb: 3,
+                                        pb: '16px !important', // Override MUI's last child padding
                                         height: '100%',
                                         display: 'flex',
-                                        flexDirection: 'column',
-                                        justifyContent: 'space-between'
+                                        flexDirection: 'column'
                                     }}
                                 >
                                     {/* Answer content */}
-                                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Box sx={{
+                                        flex: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        minHeight: 120
+                                    }}>
                                         {answer.imageUrl ? (
                                             <Box
                                                 component="img"
@@ -178,7 +183,6 @@ const QuestionDisplay = ({
                                                     width: '100%',
                                                     height: 140,
                                                     objectFit: 'cover',
-                                                    mb: 1,
                                                     borderRadius: 1
                                                 }}
                                             />
@@ -187,9 +191,10 @@ const QuestionDisplay = ({
                                                 variant="h6"
                                                 align="center"
                                                 sx={{
-                                                    fontWeight: 500,
+                                                    fontWeight: 700,
                                                     lineHeight: 1.3,
-                                                    color: 'text.primary'
+                                                    color: 'text.primary',
+                                                    fontSize: '1.1rem'
                                                 }}
                                             >
                                                 {answer.text}
@@ -197,34 +202,41 @@ const QuestionDisplay = ({
                                         )}
                                     </Box>
 
-                                    {/* Team Selection Display */}
-                                    {isSelected && selectingTeam && (
-                                        <Box
-                                            sx={{
-                                                mt: 2,
-                                                pt: 2,
-                                                borderTop: '1px solid',
-                                                borderColor: 'divider',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: 1
-                                            }}
-                                        >
-                                            <Typography
+                                    {/* Team Selection Badge */}
+                                    <Box sx={{
+                                        height: 40, // Fixed height for badge area
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        mt: 2
+                                    }}>
+                                        {isSelected && selectingTeam && (
+                                            <Paper
+                                                elevation={0}
                                                 sx={{
+                                                    px: 2,
+                                                    py: 0.5,
+                                                    backgroundColor: `${selectingTeam.color}15`,
+                                                    border: `1px solid ${selectingTeam.color}40`,
+                                                    borderRadius: 2,
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    gap: 1,
-                                                    color: selectingTeam.color,
-                                                    fontWeight: 'medium'
+                                                    gap: 1
                                                 }}
                                             >
                                                 <span style={{ fontSize: '1.2em' }}>{selectingTeam.emoji}</span>
-                                                {selectingTeam.name}
-                                            </Typography>
-                                        </Box>
-                                    )}
+                                                <Typography
+                                                    sx={{
+                                                        color: selectingTeam.color,
+                                                        fontWeight: 'medium',
+                                                        fontSize: '0.9rem'
+                                                    }}
+                                                >
+                                                    {selectingTeam.name}
+                                                </Typography>
+                                            </Paper>
+                                        )}
+                                    </Box>
                                 </CardContent>
                             </Card>
                         </Grid>
