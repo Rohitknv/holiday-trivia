@@ -163,35 +163,67 @@ const QuestionDisplay = ({
                                         pb: 3,
                                         height: '100%',
                                         display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
+                                        flexDirection: 'column',
+                                        justifyContent: 'space-between'
                                     }}
                                 >
-                                    {answer.imageUrl ? (
+                                    {/* Answer content */}
+                                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {answer.imageUrl ? (
+                                            <Box
+                                                component="img"
+                                                src={answer.imageUrl}
+                                                alt={answer.text}
+                                                sx={{
+                                                    width: '100%',
+                                                    height: 140,
+                                                    objectFit: 'cover',
+                                                    mb: 1,
+                                                    borderRadius: 1
+                                                }}
+                                            />
+                                        ) : (
+                                            <Typography
+                                                variant="h6"
+                                                align="center"
+                                                sx={{
+                                                    fontWeight: 500,
+                                                    lineHeight: 1.3,
+                                                    color: 'text.primary'
+                                                }}
+                                            >
+                                                {answer.text}
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    {/* Team Selection Display */}
+                                    {isSelected && selectingTeam && (
                                         <Box
-                                            component="img"
-                                            src={answer.imageUrl}
-                                            alt={answer.text}
                                             sx={{
-                                                width: '100%',
-                                                height: 140,
-                                                objectFit: 'cover',
-                                                mb: 1,
-                                                borderRadius: 1
-                                            }}
-                                        />
-                                    ) : (
-                                        <Typography
-                                            variant="h6"
-                                            align="center"
-                                            sx={{
-                                                fontWeight: 500,
-                                                lineHeight: 1.3,
-                                                color: 'text.primary'
+                                                mt: 2,
+                                                pt: 2,
+                                                borderTop: '1px solid',
+                                                borderColor: 'divider',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: 1
                                             }}
                                         >
-                                            {answer.text}
-                                        </Typography>
+                                            <Typography
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1,
+                                                    color: selectingTeam.color,
+                                                    fontWeight: 'medium'
+                                                }}
+                                            >
+                                                <span style={{ fontSize: '1.2em' }}>{selectingTeam.emoji}</span>
+                                                {selectingTeam.name}
+                                            </Typography>
+                                        </Box>
                                     )}
                                 </CardContent>
                             </Card>
