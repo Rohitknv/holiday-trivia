@@ -92,14 +92,70 @@ const QuestionDisplay = ({
     };
 
     return (
-        <Box sx={{ p: 3 }}>
-            {/* Question Progress */}
-            <Typography variant="subtitle1" gutterBottom>
-                Question {currentQuestionNumber} of {totalQuestions}
-            </Typography>
+        <Box sx={{ p: { xs: 2, md: 1 } }}>
+            {/* Question Progress and Text in a row */}
+            <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                mb: 3
+            }}>
+                <Typography variant="subtitle1">
+                    Question {currentQuestionNumber} of {totalQuestions}
+                </Typography>
 
-            {/* Question Text */}
-            <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+                {/* Knocked Out Teams Display - moved to header */}
+                {knockedOutTeams.size > 0 && (
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2
+                    }}>
+                        <Typography
+                            variant="subtitle2"
+                            color="error.main"
+                            sx={{ fontWeight: 'medium' }}
+                        >
+                            Knocked Out:
+                        </Typography>
+                        <Box sx={{
+                            display: 'flex',
+                            gap: 1
+                        }}>
+                            {Array.from(knockedOutTeams).map(teamId => {
+                                const team = teams.find(t => t.id === teamId);
+                                return (
+                                    <Chip
+                                        key={team.id}
+                                        label={team.name}
+                                        icon={
+                                            <span style={{
+                                                fontSize: '1.1em',
+                                                marginLeft: '8px'
+                                            }}>
+                                                {team.emoji}
+                                            </span>
+                                        }
+                                        sx={{
+                                            backgroundColor: alpha(team.color, 0.1),
+                                            border: `1px solid ${team.color}40`,
+                                            color: team.color,
+                                            fontWeight: 'medium',
+                                            '& .MuiChip-icon': {
+                                                color: 'inherit',
+                                                marginRight: '-4px'
+                                            }
+                                        }}
+                                    />
+                                );
+                            })}
+                        </Box>
+                    </Box>
+                )}
+            </Box>
+
+            {/* Question Text - full width */}
+            <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
                 <Typography
                     variant="h5"
                     sx={{
@@ -112,64 +168,9 @@ const QuestionDisplay = ({
                 </Typography>
             </Paper>
 
-            {/* Knocked Out Teams Display */}
-            {knockedOutTeams.size > 0 && (
-                <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    mb: 3,
-                    p: 1
-                }}>
-                    <Typography
-                        variant="subtitle2"
-                        color="error.main"
-                        sx={{
-                            fontWeight: 'medium',
-                            whiteSpace: 'nowrap'
-                        }}
-                    >
-                        Knocked Out:
-                    </Typography>
-                    <Box sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: 1
-                    }}>
-                        {Array.from(knockedOutTeams).map(teamId => {
-                            const team = teams.find(t => t.id === teamId);
-                            return (
-                                <Chip
-                                    key={team.id}
-                                    label={team.name}
-                                    icon={
-                                        <span style={{
-                                            fontSize: '1.1em',
-                                            marginLeft: '8px'
-                                        }}>
-                                            {team.emoji}
-                                        </span>
-                                    }
-                                    sx={{
-                                        backgroundColor: alpha(team.color, 0.1),
-                                        border: `1px solid ${team.color}40`,
-                                        color: team.color,
-                                        fontWeight: 'medium',
-                                        '& .MuiChip-icon': {
-                                            color: 'inherit',
-                                            marginRight: '-4px'
-                                        }
-                                    }}
-                                />
-                            );
-                        })}
-                    </Box>
-                </Box>
-            )}
-
-            {/* Current Team Display with Animation */}
+            {/* Current Team Display */}
             {currentTeam && !knockedOutTeams.has(currentTeam.id) && (
-                <Box sx={{ height: 80, mb: 3 }}> {/* Fixed height container to prevent layout shift */}
+                <Box sx={{ mb: 3 }}>
                     <Fade in={true} key={currentTeam?.id}>
                         <Slide direction="left" in={true}>
                             <Paper
@@ -202,8 +203,8 @@ const QuestionDisplay = ({
                 </Box>
             )}
 
-            {/* Answers Grid */}
-            <Grid container spacing={2} sx={{ mb: 4 }}>
+            {/* Answers Grid - reduced spacing */}
+            <Grid container spacing={1.5} sx={{ mb: 3 }}>
                 {question.answers.map((answer, index) => {
                     const isSelected = selectedAnswers.some(sa => sa.answerId === answer.id);
                     const selectionData = selectedAnswers.find(sa => sa.answerId === answer.id);
@@ -213,10 +214,9 @@ const QuestionDisplay = ({
                     return (
                         <Grid
                             item
-                            xs={12}      // Full width on mobile
-                            sm={6}       // 2 columns on tablet
-                            md={4}       // 3 columns on medium screens
-                            lg={3}       // 4 columns on large screens
+                            xs={12}
+                            sm={6}
+                            md={3}      // 4 columns from medium up
                             key={answer.id}
                         >
                             <Card
