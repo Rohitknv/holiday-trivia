@@ -4,49 +4,662 @@
             "id": "pop-culture",
             "name": "Pop Culture",
             "emoji": "🎬",
-            "description": "Movies, TV shows, celebrities, and trending topics"
+            "description": "Movies, TV shows, celebrities, and trending topics",
+            "questions": [
+                {
+                    "id": "pop-q1",
+                    "text": "Which actors have played James Bond in official EON productions?",
+                    "points": 6,
+                    "answers": [
+                        {
+                            "id": "pop-q1-a1",
+                            "text": "Sean Connery",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a2",
+                            "text": "Roger Moore",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a3",
+                            "text": "Pierce Brosnan",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a4",
+                            "text": "Daniel Craig",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a5",
+                            "text": "Timothy Dalton",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a6",
+                            "text": "George Lazenby",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a7",
+                            "text": "Liam Neeson",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a8",
+                            "text": "Christian Bale",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a9",
+                            "text": "Tom Cruise",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a10",
+                            "text": "Hugh Jackman",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a11",
+                            "text": "Brad Pitt",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "pop-q1-a12",
+                            "text": "Tom Hardy",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        }
+                    ]
+                }
+            ]
         },
         {
             "id": "science",
             "name": "Science & Nature",
             "emoji": "🔬",
-            "description": "Scientific discoveries, natural phenomena, and wildlife"
+            "description": "Scientific discoveries, natural phenomena, and wildlife",
+            "questions": [
+                {
+                    "id": "sci-q1",
+                    "text": "Which of these are noble gases?",
+                    "points": 6,
+                    "answers": [
+                        {
+                            "id": "sci-q1-a1",
+                            "text": "Helium",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a2",
+                            "text": "Neon",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a3",
+                            "text": "Argon",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a4",
+                            "text": "Krypton",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a5",
+                            "text": "Xenon",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a6",
+                            "text": "Radon",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a7",
+                            "text": "Oxygen",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a8",
+                            "text": "Nitrogen",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a9",
+                            "text": "Hydrogen",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a10",
+                            "text": "Carbon",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a11",
+                            "text": "Fluorine",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "sci-q1-a12",
+                            "text": "Chlorine",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        }
+                    ]
+                }
+            ]
         },
         {
             "id": "history",
             "name": "History",
             "emoji": "📜",
-            "description": "World events, ancient civilizations, and historical figures"
-        },
-        {
-            "id": "geography",
-            "name": "Geography",
-            "emoji": "🌍",
-            "description": "Countries, capitals, landmarks, and world cultures"
-        },
-        {
-            "id": "sports",
-            "name": "Sports",
-            "emoji": "⚽",
-            "description": "Athletes, teams, championships, and sporting events"
-        },
-        {
-            "id": "music",
-            "name": "Music",
-            "emoji": "🎵",
-            "description": "Artists, bands, songs, and musical instruments"
-        },
-        {
-            "id": "food",
-            "name": "Food & Drink",
-            "emoji": "🍽️",
-            "description": "Cuisines, cooking, beverages, and culinary traditions"
-        },
-        {
-            "id": "literature",
-            "name": "Literature",
-            "emoji": "📚",
-            "description": "Books, authors, poetry, and literary works"
+            "description": "World events, ancient civilizations, and historical figures",
+            "questions": [
+                {
+                    "id": "hist-q1",
+                    "text": "Which of these were Ancient Wonders of the World?",
+                    "points": 6,
+                    "answers": [
+                        {
+                            "id": "hist-q1-a1",
+                            "text": "Great Pyramid of Giza",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a2",
+                            "text": "Hanging Gardens of Babylon",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a3",
+                            "text": "Temple of Artemis at Ephesus",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a4",
+                            "text": "Statue of Zeus at Olympia",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a5",
+                            "text": "Mausoleum at Halicarnassus",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a6",
+                            "text": "Colossus of Rhodes",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a7",
+                            "text": "Stonehenge",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a8",
+                            "text": "Parthenon",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a9",
+                            "text": "Great Wall of China",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a10",
+                            "text": "Petra",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a11",
+                            "text": "Machu Picchu",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q1-a12",
+                            "text": "Taj Mahal",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        }
+                    ]
+                },
+                {
+                    "id": "hist-q2",
+                    "text": "Which of these were Roman Emperors?",
+                    "points": 6,
+                    "answers": [
+                        {
+                            "id": "hist-q2-a1",
+                            "text": "Augustus",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a2",
+                            "text": "Marcus Aurelius",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a3",
+                            "text": "Hadrian",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a4",
+                            "text": "Constantine",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a5",
+                            "text": "Trajan",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a6",
+                            "text": "Nero",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a7",
+                            "text": "Leonidas",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a8",
+                            "text": "Pericles",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a9",
+                            "text": "Alexander the Great",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a10",
+                            "text": "Xerxes",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a11",
+                            "text": "Ptolemy",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q2-a12",
+                            "text": "Cleopatra",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        }
+                    ]
+                },
+                {
+                    "id": "hist-q3",
+                    "text": "Which of these events occurred during World War II (1939-1945)?",
+                    "points": 6,
+                    "answers": [
+                        {
+                            "id": "hist-q3-a1",
+                            "text": "D-Day Invasion",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a2",
+                            "text": "Battle of Stalingrad",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a3",
+                            "text": "Pearl Harbor Attack",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a4",
+                            "text": "Battle of Midway",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a5",
+                            "text": "Battle of Britain",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a6",
+                            "text": "Operation Barbarossa",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a7",
+                            "text": "Battle of Waterloo",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a8",
+                            "text": "Battle of Gettysburg",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a9",
+                            "text": "Cuban Missile Crisis",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a10",
+                            "text": "Korean War",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a11",
+                            "text": "Vietnam War",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q3-a12",
+                            "text": "Russian Revolution",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        }
+                    ]
+                },
+                {
+                    "id": "hist-q4",
+                    "text": "Which of these were Ancient Egyptian Pharaohs?",
+                    "points": 6,
+                    "answers": [
+                        {
+                            "id": "hist-q4-a1",
+                            "text": "Tutankhamun",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a2",
+                            "text": "Ramesses II",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a3",
+                            "text": "Thutmose III",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a4",
+                            "text": "Khufu",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a5",
+                            "text": "Hatshepsut",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a6",
+                            "text": "Amenhotep III",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a7",
+                            "text": "Hammurabi",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a8",
+                            "text": "Nebuchadnezzar",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a9",
+                            "text": "Cyrus the Great",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a10",
+                            "text": "Darius I",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a11",
+                            "text": "Ashurbanipal",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q4-a12",
+                            "text": "Sargon of Akkad",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        }
+                    ]
+                },
+                {
+                    "id": "hist-q5",
+                    "text": "Which of these were Renaissance artists?",
+                    "points": 6,
+                    "answers": [
+                        {
+                            "id": "hist-q5-a1",
+                            "text": "Leonardo da Vinci",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a2",
+                            "text": "Michelangelo",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a3",
+                            "text": "Raphael",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a4",
+                            "text": "Botticelli",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a5",
+                            "text": "Donatello",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a6",
+                            "text": "Titian",
+                            "imageUrl": null,
+                            "isCorrect": true,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a7",
+                            "text": "Vincent van Gogh",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a8",
+                            "text": "Pablo Picasso",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a9",
+                            "text": "Claude Monet",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a10",
+                            "text": "Salvador Dali",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a11",
+                            "text": "Andy Warhol",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        },
+                        {
+                            "id": "hist-q5-a12",
+                            "text": "Rembrandt",
+                            "imageUrl": null,
+                            "isCorrect": false,
+                            "points": 1
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

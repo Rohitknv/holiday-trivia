@@ -1,5 +1,5 @@
 import { Container, Typography, Box, Tabs, Tab } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TeamSelector from './components/TeamSelector';
 import Play from './components/Play';
 
@@ -11,16 +11,29 @@ function TabPanel({ children, value, index }) {
     );
 }
 
+const STORAGE_KEY = 'trivia_teams';
+
 function App() {
     const [currentTab, setCurrentTab] = useState(0);
     const [teams, setTeams] = useState(() => {
         try {
-            const savedTeams = localStorage.getItem('trivia_teams');
+            const savedTeams = localStorage.getItem(STORAGE_KEY);
             return savedTeams ? JSON.parse(savedTeams) : [];
         } catch {
             return [];
         }
     });
+
+    // Save teams to localStorage whenever they change
+    useEffect(() => {
+        try {
+            if (teams.length > 0) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
+            }
+        } catch (error) {
+            console.error('Failed to save teams to storage:', error);
+        }
+    }, [teams]);
 
     const handleTabChange = (event, newValue) => {
         setCurrentTab(newValue);

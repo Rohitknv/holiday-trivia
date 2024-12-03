@@ -66,7 +66,11 @@ const TeamSelector = ({ teams, setTeams }) => {
     };
 
     const handleDeleteTeam = (teamToDelete) => {
-        setTeams(teams.filter(team => team.id !== teamToDelete.id));
+        const updatedTeams = teams.filter(team => team.id !== teamToDelete.id);
+        setTeams(updatedTeams);
+        if (updatedTeams.length === 0) {
+            localStorage.removeItem(STORAGE_KEY);
+        }
     };
 
     const getRandomEmoji = () => {
