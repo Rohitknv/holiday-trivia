@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Button, Grid, Card, CardContent, Fade, Slide } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 const QuestionDisplay = ({
     question,
@@ -116,6 +117,7 @@ const QuestionDisplay = ({
                     const isSelected = selectedAnswers.some(sa => sa.answerId === answer.id);
                     const selectionData = selectedAnswers.find(sa => sa.answerId === answer.id);
                     const selectingTeam = selectionData ? teams.find(t => t.id === selectionData.teamId) : null;
+                    const isCorrectSelection = isSelected && answer.isCorrect;
 
                     return (
                         <Grid item xs={12} sm={6} md={4} key={answer.id}>
@@ -125,7 +127,16 @@ const QuestionDisplay = ({
                                     cursor: isSelected ? 'default' : 'pointer',
                                     transition: 'all 0.2s ease',
                                     position: 'relative',
-                                    opacity: isSelected ? 0.7 : 1,
+                                    backgroundColor: isSelected ? (
+                                        isCorrectSelection
+                                            ? alpha('#4caf50', 0.1)  // Light green background
+                                            : alpha('#f44336', 0.1)  // Light red background
+                                    ) : 'background.paper',
+                                    borderLeft: isSelected ? (
+                                        isCorrectSelection
+                                            ? '4px solid #4caf50'    // Solid green border
+                                            : '4px solid #f44336'    // Solid red border
+                                    ) : 'none',
                                     '&:hover': !isSelected && {
                                         transform: 'translateY(-4px)',
                                         boxShadow: 3
@@ -160,20 +171,14 @@ const QuestionDisplay = ({
                                     sx={{
                                         pt: 4,
                                         px: 3,
-                                        pb: '16px !important', // Override MUI's last child padding
+                                        pb: '16px !important',
                                         height: '100%',
                                         display: 'flex',
                                         flexDirection: 'column'
                                     }}
                                 >
                                     {/* Answer content */}
-                                    <Box sx={{
-                                        flex: 1,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        minHeight: 120
-                                    }}>
+                                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 120 }}>
                                         {answer.imageUrl ? (
                                             <Box
                                                 component="img"
@@ -193,7 +198,11 @@ const QuestionDisplay = ({
                                                 sx={{
                                                     fontWeight: 700,
                                                     lineHeight: 1.3,
-                                                    color: 'text.primary',
+                                                    color: isSelected ? (
+                                                        isCorrectSelection
+                                                            ? '#2e7d32'  // Darker green text
+                                                            : '#d32f2f'  // Darker red text
+                                                    ) : 'text.primary',
                                                     fontSize: '1.1rem'
                                                 }}
                                             >
@@ -203,20 +212,16 @@ const QuestionDisplay = ({
                                     </Box>
 
                                     {/* Team Selection Badge */}
-                                    <Box sx={{
-                                        height: 40, // Fixed height for badge area
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        mt: 2
-                                    }}>
+                                    <Box sx={{ height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 2 }}>
                                         {isSelected && selectingTeam && (
                                             <Paper
                                                 elevation={0}
                                                 sx={{
                                                     px: 2,
                                                     py: 0.5,
-                                                    backgroundColor: `${selectingTeam.color}15`,
+                                                    backgroundColor: isCorrectSelection ?
+                                                        'success.lighter' :
+                                                        'error.lighter',
                                                     border: `1px solid ${selectingTeam.color}40`,
                                                     borderRadius: 2,
                                                     display: 'flex',
@@ -229,10 +234,22 @@ const QuestionDisplay = ({
                                                     sx={{
                                                         color: selectingTeam.color,
                                                         fontWeight: 'medium',
-                                                        fontSize: '0.9rem'
+                                                        fontSize: '0.9rem',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 1
                                                     }}
                                                 >
                                                     {selectingTeam.name}
+                                                    {isCorrectSelection && (
+                                                        <span style={{
+                                                            color: 'success.dark',
+                                                            fontSize: '0.8rem',
+                                                            fontWeight: 'bold'
+                                                        }}>
+                                                            (+{answer.points} pts)
+                                                        </span>
+                                                    )}
                                                 </Typography>
                                             </Paper>
                                         )}
