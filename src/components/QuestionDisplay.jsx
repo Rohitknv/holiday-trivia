@@ -68,12 +68,12 @@ const QuestionDisplay = ({
         } else {
             // Knock out current team
             setKnockedOutTeams(prev => new Set([...prev, currentTeam.id]));
+        }
 
-            // Find next available team
-            const nextTeam = findNextAvailableTeam(currentTeamIndex);
-            if (nextTeam !== -1) {
-                setCurrentTeamIndex(nextTeam);
-            }
+        // Always move to next available team
+        const nextTeam = findNextAvailableTeam(currentTeamIndex);
+        if (nextTeam !== -1) {
+            setCurrentTeamIndex(nextTeam);
         }
     };
 
@@ -211,7 +211,14 @@ const QuestionDisplay = ({
                     const isCorrectSelection = isSelected && answer.isCorrect;
 
                     return (
-                        <Grid item xs={12} sm={6} md={4} key={answer.id}>
+                        <Grid
+                            item
+                            xs={12}      // Full width on mobile
+                            sm={6}       // 2 columns on tablet
+                            md={4}       // 3 columns on medium screens
+                            lg={3}       // 4 columns on large screens
+                            key={answer.id}
+                        >
                             <Card
                                 sx={{
                                     height: '100%',
@@ -238,7 +245,11 @@ const QuestionDisplay = ({
                                             : `${incorrectAnswerShake} 0.5s ease`
                                     ) : 'none',
                                     // Prevent hover animation during result animation
-                                    pointerEvents: isSelected ? 'none' : 'auto'
+                                    pointerEvents: isSelected ? 'none' : 'auto',
+                                    // Adjust content sizing for smaller cards
+                                    '& .MuiCardContent-root': {
+                                        p: { xs: 2, md: 2.5 }, // Responsive padding
+                                    }
                                 }}
                                 onClick={() => !isSelected && handleAnswerSelect(answer)}
                             >
@@ -268,7 +279,7 @@ const QuestionDisplay = ({
                                 <CardContent
                                     sx={{
                                         pt: 4,
-                                        px: 3,
+                                        px: { xs: 2, md: 2.5 },
                                         pb: '16px !important',
                                         height: '100%',
                                         display: 'flex',
@@ -276,7 +287,13 @@ const QuestionDisplay = ({
                                     }}
                                 >
                                     {/* Answer content */}
-                                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 120 }}>
+                                    <Box sx={{
+                                        flex: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        minHeight: { xs: 100, md: 110 } // Slightly reduced height
+                                    }}>
                                         {answer.imageUrl ? (
                                             <Box
                                                 component="img"
@@ -301,7 +318,7 @@ const QuestionDisplay = ({
                                                             ? '#2e7d32'  // Darker green text
                                                             : '#d32f2f'  // Darker red text
                                                     ) : 'text.primary',
-                                                    fontSize: '1.1rem'
+                                                    fontSize: { xs: '1rem', md: '1.1rem' } // Responsive font size
                                                 }}
                                             >
                                                 {answer.text}
