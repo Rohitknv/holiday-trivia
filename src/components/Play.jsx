@@ -52,14 +52,30 @@ const Play = ({ teams, setTeams }) => {
     const [transitionTimeRemaining, setTransitionTimeRemaining] = useState(LEADERBOARD_TRANSITION_TIME);
     const [gameComplete, setGameComplete] = useState(false);
 
-    // Check if all categories are completed
-    const allCategoriesComplete = selectedCategories.length === categoriesData.categories.length;
+    // Check if all questions in all categories are completed
+    const isGameComplete = useMemo(() => {
+        if (selectedCategories.length !== categoriesData.categories.length) {
+            return false;
+        }
+
+        // Check if we're still in the middle of a category
+        if (currentQuestion) {
+            return false;
+        }
+
+        // Check if we're in transition
+        if (showingTransitionLeaderboard) {
+            return false;
+        }
+
+        return true;
+    }, [selectedCategories.length, currentQuestion, showingTransitionLeaderboard]);
 
     useEffect(() => {
-        if (allCategoriesComplete && !gameComplete) {
+        if (isGameComplete && !gameComplete) {
             setGameComplete(true);
         }
-    }, [allCategoriesComplete]);
+    }, [isGameComplete]);
 
     // Add effect for countdown
     useEffect(() => {
@@ -121,17 +137,25 @@ const Play = ({ teams, setTeams }) => {
         const nextIndex = questionIndex + 1;
 
         if (nextIndex < currentCategory.questions.length) {
+            // Continue to next question in category
             setCurrentQuestion(currentCategory.questions[nextIndex]);
             setQuestionIndex(nextIndex);
         } else {
+            // Category is complete
             setShowingTransitionLeaderboard(true);
             setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
 
+            // Reset category state
             setTimeout(() => {
                 setShowingTransitionLeaderboard(false);
                 setCurrentQuestion(null);
                 setQuestionIndex(0);
                 setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+
+                // Reset team order for next category
+                const newHistory = [...turnHistory, selectingTeam.id];
+                setTurnHistory(newHistory);
+                localStorage.setItem('turn_history', JSON.stringify(newHistory));
             }, LEADERBOARD_TRANSITION_TIME);
         }
     };
