@@ -91,6 +91,16 @@ const QuestionDisplay = ({
         return -1; // All teams are knocked out
     };
 
+    // Add function to check if question is complete
+    const isQuestionComplete = () => {
+        const allTeamsKnockedOut = teamOrder.every(team => knockedOutTeams.has(team.id));
+        const allCorrectAnswersFound = question.answers
+            .filter(a => a.isCorrect)
+            .every(a => selectedAnswers.some(sa => sa.answerId === a.id));
+
+        return allTeamsKnockedOut || allCorrectAnswersFound;
+    };
+
     return (
         <Box sx={{ p: { xs: 2, md: 1 } }}>
             {/* Question Progress and Text in a row */}
@@ -327,46 +337,47 @@ const QuestionDisplay = ({
                                     </Box>
 
                                     {/* Team Selection Badge */}
-                                    <Box sx={{ height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 2 }}>
+                                    <Box sx={{ height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 2 }}>
                                         {isSelected && selectingTeam && (
-                                            <Paper
-                                                elevation={0}
+                                            <Box
                                                 sx={{
-                                                    px: 2,
-                                                    py: 0.5,
-                                                    backgroundColor: isCorrectSelection ?
-                                                        'success.lighter' :
-                                                        'error.lighter',
-                                                    border: `1px solid ${selectingTeam.color}40`,
-                                                    borderRadius: 2,
+                                                    width: 32,
+                                                    height: 32,
+                                                    borderRadius: '50%',
+                                                    backgroundColor: `${selectingTeam.color}25`,
+                                                    border: `2px solid ${selectingTeam.color}70`,
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    gap: 1
+                                                    justifyContent: 'center',
+                                                    fontSize: '1.2em',
+                                                    position: 'relative',
+                                                    boxShadow: 1
                                                 }}
                                             >
-                                                <span style={{ fontSize: '1.2em' }}>{selectingTeam.emoji}</span>
-                                                <Typography
-                                                    sx={{
-                                                        color: selectingTeam.color,
-                                                        fontWeight: 'medium',
-                                                        fontSize: '0.9rem',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: 1
-                                                    }}
-                                                >
-                                                    {selectingTeam.name}
-                                                    {isCorrectSelection && (
-                                                        <span style={{
-                                                            color: 'success.dark',
-                                                            fontSize: '0.8rem',
-                                                            fontWeight: 'bold'
-                                                        }}>
-                                                            (+{answer.points} pts)
-                                                        </span>
-                                                    )}
-                                                </Typography>
-                                            </Paper>
+                                                {selectingTeam.emoji}
+                                                {isCorrectSelection && (
+                                                    <Typography
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            top: -8,
+                                                            right: -8,
+                                                            backgroundColor: 'success.main',
+                                                            color: 'white',
+                                                            borderRadius: '50%',
+                                                            width: 20,
+                                                            height: 20,
+                                                            fontSize: '0.7rem',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontWeight: 'bold',
+                                                            boxShadow: 1
+                                                        }}
+                                                    >
+                                                        +{answer.points}
+                                                    </Typography>
+                                                )}
+                                            </Box>
                                         )}
                                     </Box>
                                 </CardContent>
@@ -381,6 +392,14 @@ const QuestionDisplay = ({
                 <Button
                     variant="contained"
                     onClick={onQuestionComplete}
+                    disabled={!isQuestionComplete()}
+                    sx={{
+                        opacity: isQuestionComplete() ? 1 : 0.5,
+                        '&.Mui-disabled': {
+                            backgroundColor: 'grey.300',
+                            color: 'grey.500'
+                        }
+                    }}
                 >
                     Next Question
                 </Button>
