@@ -1,0 +1,52 @@
+{
+    "categories": [
+        {
+            "id": "pop-culture",
+            "name": "Pop Culture",
+            "emoji": "🎬",
+            "description": "Movies, TV shows, celebrities, and trending topics"
+        },
+        {
+            "id": "science",
+            "name": "Science & Nature",
+            "emoji": "🔬",
+            "description": "Scientific discoveries, natural phenomena, and wildlife"
+        },
+        {
+            "id": "history",
+            "name": "History",
+            "emoji": "📜",
+            "description": "World events, ancient civilizations, and historical figures"
+        },
+        {
+            "id": "geography",
+            "name": "Geography",
+            "emoji": "🌍",
+            "description": "Countries, capitals, landmarks, and world cultures"
+        },
+        {
+            "id": "sports",
+            "name": "Sports",
+            "emoji": "⚽",
+            "description": "Athletes, teams, championships, and sporting events"
+        },
+        {
+            "id": "music",
+            "name": "Music",
+            "emoji": "🎵",
+            "description": "Artists, bands, songs, and musical instruments"
+        },
+        {
+            "id": "food",
+            "name": "Food & Drink",
+            "emoji": "🍽️",
+            "description": "Cuisines, cooking, beverages, and culinary traditions"
+        },
+        {
+            "id": "literature",
+            "name": "Literature",
+            "emoji": "📚",
+            "description": "Books, authors, poetry, and literary works"
+        }
+    ]
+}

@@ -15,9 +15,12 @@ import {
     Grid,
     Alert,
     Snackbar,
+    Paper,
+    Divider,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 const TEAM_COLORS = [
     { name: 'Red', value: '#ef5350' },
@@ -30,32 +33,23 @@ const TEAM_COLORS = [
     { name: 'Cyan', value: '#26c6da' },
 ];
 
+const TEAM_EMOJIS = [
+    '🦁', '🐯', '🦊', '🦝', '🐼', '🦄', '🦅', '🦜',
+    '🐙', '🦈', '🦀', '🐉', '🦖', '🦕', '🦭', '🐸',
+    '🦩', '🦚', '🦉', '🐺', '🐲', '🦡', '🦫', '🦘'
+];
+
 const STORAGE_KEY = 'trivia_teams';
 
-const TeamSelector = () => {
-    const [teams, setTeams] = useState(() => {
-        try {
-            const savedTeams = localStorage.getItem(STORAGE_KEY);
-            return savedTeams ? JSON.parse(savedTeams) : [];
-        } catch (error) {
-            console.error('Error loading teams:', error);
-            return [];
-        }
-    });
+const TeamSelector = ({ teams, setTeams }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingTeam, setEditingTeam] = useState(null);
     const [teamName, setTeamName] = useState('');
     const [selectedColor, setSelectedColor] = useState(TEAM_COLORS[0].value);
+    const [scores, setScores] = useState({});
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
-        } catch (error) {
-            setError('Failed to save teams to storage');
-            console.error('Error saving teams:', error);
-        }
-    }, [teams]);
+    const sortedTeams = [...teams].sort((a, b) => b.score - a.score);
 
     const handleAddTeam = () => {
         setTeamName('');
@@ -75,6 +69,11 @@ const TeamSelector = () => {
         setTeams(teams.filter(team => team.id !== teamToDelete.id));
     };
 
+    const getRandomEmoji = () => {
+        const randomIndex = Math.floor(Math.random() * TEAM_EMOJIS.length);
+        return TEAM_EMOJIS[randomIndex];
+    };
+
     const handleSaveTeam = () => {
         if (!teamName.trim()) return;
 
@@ -90,38 +89,58 @@ const TeamSelector = () => {
                 name: teamName,
                 color: selectedColor,
                 score: 0,
+                emoji: getRandomEmoji(),
             };
             setTeams([...teams, newTeam]);
         }
         setDialogOpen(false);
     };
 
-    const handleClearTeams = () => {
-        try {
-            setTeams([]);
-            localStorage.removeItem(STORAGE_KEY);
-        } catch (error) {
-            setError('Failed to clear teams');
-            console.error('Error clearing teams:', error);
-        }
+    const handleScoreChange = (team, value) => {
+        setScores({
+            ...scores,
+            [team.id]: value
+        });
     };
 
-    const handleCloseError = () => {
-        setError(null);
+    const handleScoreBlur = (team) => {
+        const newScore = Number(scores[team.id]);
+        if (isNaN(newScore)) {
+            setError('Please enter a valid number');
+            return;
+        }
+
+        const validScore = Math.max(0, newScore); // Prevent negative scores
+        setTeams(teams.map(t =>
+            t.id === team.id ? { ...t, score: validScore } : t
+        ));
+        setScores({ ...scores, [team.id]: '' });
+    };
+
+    const handleResetAll = () => {
+        if (window.confirm('Are you sure you want to reset everything? This will delete all teams and their scores.')) {
+            setTeams([]);
+            localStorage.removeItem(STORAGE_KEY);
+            setError(null);
+            setScores({});
+            setDialogOpen(false);
+            setEditingTeam(null);
+        }
     };
 
     return (
         <Box sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h5">Team Management</Typography>
+                <Typography variant="h5">Game Management</Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
                         variant="outlined"
                         color="error"
-                        onClick={handleClearTeams}
+                        onClick={handleResetAll}
                         disabled={teams.length === 0}
+                        startIcon={<DeleteIcon />}
                     >
-                        Clear All Teams
+                        Reset Everything
                     </Button>
                     <Button variant="contained" onClick={handleAddTeam}>
                         Add Team
@@ -129,58 +148,131 @@ const TeamSelector = () => {
                 </Box>
             </Box>
 
-            <List>
-                {teams.map((team) => (
-                    <ListItem
-                        key={team.id}
-                        sx={{
-                            mb: 1,
-                            border: 1,
-                            borderColor: 'divider',
-                            borderRadius: 1,
-                            backgroundColor: `${team.color}15`,
-                            pr: '160px',
-                        }}
-                        secondaryAction={
-                            <Box sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                position: 'absolute',
-                                right: 8,
-                                top: '50%',
-                                transform: 'translateY(-50%)'
-                            }}>
+            <Grid container spacing={3}>
+                {/* Team Management Section */}
+                <Grid item xs={12} md={7}>
+                    <List>
+                        {teams.map((team) => (
+                            <ListItem
+                                key={team.id}
+                                sx={{
+                                    mb: 2,
+                                    border: 1,
+                                    borderColor: 'divider',
+                                    borderRadius: 1,
+                                    backgroundColor: `${team.color}15`,
+                                }}
+                            >
+                                <Box sx={{
+                                    display: 'flex',
+                                    width: '100%',
+                                    alignItems: 'center',
+                                    flexWrap: 'wrap',
+                                    gap: 2
+                                }}>
+                                    <ListItemText
+                                        primary={
+                                            <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <span style={{ fontSize: '1.2em' }}>{team.emoji}</span>
+                                                {team.name}
+                                            </Box>
+                                        }
+                                        sx={{
+                                            flex: '1 1 200px',
+                                            '& .MuiListItemText-primary': {
+                                                color: team.color,
+                                                fontWeight: 'bold',
+                                            }
+                                        }}
+                                    />
+
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 2,
+                                        flex: '1 1 200px'
+                                    }}>
+                                        <TextField
+                                            size="small"
+                                            type="number"
+                                            label="Score"
+                                            value={scores[team.id] !== undefined ? scores[team.id] : team.score}
+                                            onChange={(e) => handleScoreChange(team, e.target.value)}
+                                            onBlur={() => handleScoreBlur(team)}
+                                            sx={{ width: '100px' }}
+                                        />
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                        <IconButton onClick={() => handleEditTeam(team)}>
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton onClick={() => handleDeleteTeam(team)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                        ))}
+                    </List>
+                </Grid>
+
+                {/* Leaderboard Section */}
+                <Grid item xs={12} md={5}>
+                    <Paper sx={{ p: 2, backgroundColor: 'grey.50' }}>
+                        <Typography variant="h6" gutterBottom sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            mb: 2
+                        }}>
+                            <EmojiEventsIcon /> Leaderboard
+                        </Typography>
+
+                        {sortedTeams.map((team, index) => (
+                            <Paper
+                                key={team.id}
+                                elevation={1}
+                                sx={{
+                                    p: 2,
+                                    mb: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    backgroundColor: `${team.color}15`,
+                                    transform: `scale(${1 - index * 0.02})`,
+                                    transformOrigin: 'top center',
+                                }}
+                            >
+                                <Typography variant="h6" sx={{ mr: 2, color: team.color }}>
+                                    #{index + 1}
+                                </Typography>
                                 <Typography
                                     sx={{
+                                        flex: 1,
                                         color: team.color,
                                         fontWeight: 'bold',
-                                        minWidth: '80px',
-                                        mr: 1
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
                                     }}
                                 >
-                                    Score: {team.score}
+                                    <span style={{ fontSize: '1.2em' }}>{team.emoji}</span>
+                                    {team.name}
                                 </Typography>
-                                <IconButton onClick={() => handleEditTeam(team)}>
-                                    <EditIcon />
-                                </IconButton>
-                                <IconButton onClick={() => handleDeleteTeam(team)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Box>
-                        }
-                    >
-                        <ListItemText
-                            primary={team.name}
-                            sx={{
-                                '& .MuiListItemText-primary': {
-                                    color: team.color,
-                                    fontWeight: 'bold',
-                                }
-                            }}
-                        />
-                    </ListItem>
-                ))}
-            </List>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        color: team.color
+                                    }}
+                                >
+                                    {team.score}
+                                </Typography>
+                            </Paper>
+                        ))}
+                    </Paper>
+                </Grid>
+            </Grid>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
                 <DialogTitle>{editingTeam ? 'Edit Team' : 'Add New Team'}</DialogTitle>
@@ -224,12 +316,12 @@ const TeamSelector = () => {
 
             <Snackbar
                 open={!!error}
-                autoHideDuration={6000}
-                onClose={handleCloseError}
+                autoHideDuration={3000}
+                onClose={() => setError(null)}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
                 <Alert
-                    onClose={handleCloseError}
+                    onClose={() => setError(null)}
                     severity="error"
                     sx={{ width: '100%' }}
                 >
