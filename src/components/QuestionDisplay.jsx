@@ -25,7 +25,8 @@ const QuestionDisplay = ({
     setTeams,
     onQuestionComplete,
     currentQuestionNumber,
-    totalQuestions
+    totalQuestions,
+    onBackToCategories
 }) => {
     // Track selected answers and team order
     const [selectedAnswers, setSelectedAnswers] = useState([]);
@@ -93,6 +94,16 @@ const QuestionDisplay = ({
 
     // Add function to check if question is complete
     const isQuestionComplete = () => {
+        const allTeamsKnockedOut = teamOrder.every(team => knockedOutTeams.has(team.id));
+        const allCorrectAnswersFound = question.answers
+            .filter(a => a.isCorrect)
+            .every(a => selectedAnswers.some(sa => sa.answerId === a.id));
+
+        return allTeamsKnockedOut || allCorrectAnswersFound;
+    };
+
+    // Check if all questions in category are complete
+    const allQuestionsComplete = () => {
         const allTeamsKnockedOut = teamOrder.every(team => knockedOutTeams.has(team.id));
         const allCorrectAnswersFound = question.answers
             .filter(a => a.isCorrect)
@@ -402,22 +413,44 @@ const QuestionDisplay = ({
                 })}
             </Grid>
 
-            {/* Next Question Button */}
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            {/* Navigation Buttons */}
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mt: 3
+            }}>
                 <Button
                     variant="contained"
-                    onClick={onQuestionComplete}
-                    disabled={!isQuestionComplete()}
+                    onClick={onBackToCategories}
+                    disabled={!allQuestionsComplete() || currentQuestionNumber !== totalQuestions}
                     sx={{
-                        opacity: isQuestionComplete() ? 1 : 0.5,
+                        opacity: allQuestionsComplete() && currentQuestionNumber === totalQuestions ? 1 : 0.5,
                         '&.Mui-disabled': {
                             backgroundColor: 'grey.300',
                             color: 'grey.500'
                         }
                     }}
                 >
-                    Next Question
+                    Back to Categories
                 </Button>
+
+                {currentQuestionNumber < totalQuestions && (
+                    <Button
+                        variant="contained"
+                        onClick={onQuestionComplete}
+                        disabled={!isQuestionComplete()}
+                        sx={{
+                            opacity: isQuestionComplete() ? 1 : 0.5,
+                            '&.Mui-disabled': {
+                                backgroundColor: 'grey.300',
+                                color: 'grey.500'
+                            }
+                        }}
+                    >
+                        Next Question
+                    </Button>
+                )}
             </Box>
         </Box>
     );

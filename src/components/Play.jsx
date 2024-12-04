@@ -173,6 +173,18 @@ const Play = ({ teams, setTeams }) => {
         setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
     };
 
+    const handleBackToCategories = () => {
+        setShowingTransitionLeaderboard(true);
+        setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+
+        setTimeout(() => {
+            setShowingTransitionLeaderboard(false);
+            setCurrentQuestion(null);
+            setQuestionIndex(0);
+            setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+        }, LEADERBOARD_TRANSITION_TIME);
+    };
+
     const currentCategory = currentQuestion ?
         categoriesData.categories.find(c => c.questions.includes(currentQuestion)) :
         null;
@@ -495,6 +507,7 @@ const Play = ({ teams, setTeams }) => {
                                 onQuestionComplete={handleQuestionComplete}
                                 currentQuestionNumber={questionIndex + 1}
                                 totalQuestions={currentCategory.questions.length}
+                                onBackToCategories={handleBackToCategories}
                             />
                             <Box sx={{ mt: 4 }}>
                                 <Paper sx={{ p: 2, backgroundColor: 'grey.50' }}>
