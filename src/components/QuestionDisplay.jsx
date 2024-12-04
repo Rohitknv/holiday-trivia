@@ -35,7 +35,7 @@ const QuestionDisplay = ({
 
     // Reset state including knocked out teams when question changes
     useEffect(() => {
-        const sortedTeams = [...teams].sort((a, b) => b.score - a.score);
+        const sortedTeams = [...teams].sort((a, b) => a.score - b.score);
         setTeamOrder(sortedTeams);
         setCurrentTeamIndex(0);
         setSelectedAnswers([]);
