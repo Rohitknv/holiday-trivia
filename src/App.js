@@ -2,6 +2,7 @@ import { Container, Typography, Box, Tabs, Tab } from '@mui/material';
 import { useState, useEffect } from 'react';
 import TeamSelector from './components/TeamSelector';
 import Play from './components/Play';
+import Leaderboard from './components/Leaderboard';
 
 function TabPanel({ children, value, index }) {
     return (
@@ -47,9 +48,11 @@ function App() {
                         value={currentTab}
                         onChange={handleTabChange}
                         centered
+                        sx={{ mb: 3 }}
                     >
-                        <Tab label="Game Management" />
-                        <Tab label="Play" />
+                        <Tab label="Teams" />
+                        <Tab label="Play" disabled={teams.length < 2} />
+                        <Tab label="Leaderboard" disabled={teams.length < 2} />
                     </Tabs>
                 </Box>
 
@@ -58,6 +61,9 @@ function App() {
                 </TabPanel>
                 <TabPanel value={currentTab} index={1}>
                     <Play teams={teams} setTeams={setTeams} />
+                </TabPanel>
+                <TabPanel value={currentTab} index={2}>
+                    <Leaderboard teams={teams} />
                 </TabPanel>
             </Box>
         </Container>
