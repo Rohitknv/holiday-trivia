@@ -54,6 +54,7 @@ const Play = ({ teams, setTeams }) => {
         const saved = localStorage.getItem('completed_questions');
         return saved ? new Set(JSON.parse(saved)) : new Set();
     });
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
     // Add effect for countdown
     useEffect(() => {
@@ -109,6 +110,8 @@ const Play = ({ teams, setTeams }) => {
     };
 
     const handleQuestionComplete = () => {
+        if (isTransitioning) return; // Prevent multiple transitions
+
         const currentCategory = categoriesData.categories.find(
             c => c.questions.includes(currentQuestion)
         );
@@ -121,8 +124,12 @@ const Play = ({ teams, setTeams }) => {
 
         if (nextIndex < currentCategory.questions.length) {
             // Continue to next question in category
-            setCurrentQuestion(currentCategory.questions[nextIndex]);
-            setQuestionIndex(nextIndex);
+            setIsTransitioning(true);
+            setTimeout(() => {
+                setCurrentQuestion(currentCategory.questions[nextIndex]);
+                setQuestionIndex(nextIndex);
+                setIsTransitioning(false);
+            }, 300); // Short delay for transition
         } else {
             // Check if all questions in category are completed
             const allCategoryQuestionsComplete = currentCategory.questions.every(
@@ -130,7 +137,8 @@ const Play = ({ teams, setTeams }) => {
             );
 
             if (allCategoryQuestionsComplete) {
-                // Category is complete
+                // Category is complete - show transition
+                setIsTransitioning(true);
                 setShowingTransitionLeaderboard(true);
                 setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
 
@@ -139,14 +147,19 @@ const Play = ({ teams, setTeams }) => {
                     setCurrentQuestion(null);
                     setQuestionIndex(0);
                     setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+                    setIsTransitioning(false);
                 }, LEADERBOARD_TRANSITION_TIME);
             } else {
                 // Go back to first incomplete question
-                const firstIncompleteIndex = currentCategory.questions.findIndex(
-                    question => !newCompletedQuestions.has(question.id)
-                );
-                setCurrentQuestion(currentCategory.questions[firstIncompleteIndex]);
-                setQuestionIndex(firstIncompleteIndex);
+                setIsTransitioning(true);
+                setTimeout(() => {
+                    const firstIncompleteIndex = currentCategory.questions.findIndex(
+                        question => !newCompletedQuestions.has(question.id)
+                    );
+                    setCurrentQuestion(currentCategory.questions[firstIncompleteIndex]);
+                    setQuestionIndex(firstIncompleteIndex);
+                    setIsTransitioning(false);
+                }, 300);
             }
         }
     };
@@ -174,6 +187,9 @@ const Play = ({ teams, setTeams }) => {
     };
 
     const handleBackToCategories = () => {
+        if (isTransitioning) return;
+
+        setIsTransitioning(true);
         setShowingTransitionLeaderboard(true);
         setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
 
@@ -182,6 +198,7 @@ const Play = ({ teams, setTeams }) => {
             setCurrentQuestion(null);
             setQuestionIndex(0);
             setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+            setIsTransitioning(false);
         }, LEADERBOARD_TRANSITION_TIME);
     };
 

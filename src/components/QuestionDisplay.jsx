@@ -92,7 +92,7 @@ const QuestionDisplay = ({
         return -1; // All teams are knocked out
     };
 
-    // Add function to check if question is complete
+    // Check if current question is complete
     const isQuestionComplete = () => {
         const allTeamsKnockedOut = teamOrder.every(team => knockedOutTeams.has(team.id));
         const allCorrectAnswersFound = question.answers
@@ -102,8 +102,21 @@ const QuestionDisplay = ({
         return allTeamsKnockedOut || allCorrectAnswersFound;
     };
 
-    // Check if all questions in category are complete
+    // Check if all questions up to current one are complete
     const allQuestionsComplete = () => {
+        // Current question must be complete
+        if (!isQuestionComplete()) {
+            return false;
+        }
+
+        // Must be on last question
+        if (currentQuestionNumber !== totalQuestions) {
+            return false;
+        }
+
+        // Category is complete if either:
+        // 1. All correct answers are found, OR
+        // 2. All teams are knocked out
         const allTeamsKnockedOut = teamOrder.every(team => knockedOutTeams.has(team.id));
         const allCorrectAnswersFound = question.answers
             .filter(a => a.isCorrect)
