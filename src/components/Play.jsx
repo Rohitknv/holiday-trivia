@@ -52,9 +52,17 @@ const Play = ({ teams, setTeams }) => {
     const [transitionTimeRemaining, setTransitionTimeRemaining] = useState(LEADERBOARD_TRANSITION_TIME);
     const [completedQuestions, setCompletedQuestions] = useState(() => {
         const saved = localStorage.getItem('completed_questions');
-        return saved ? new Set(JSON.parse(saved)) : new Set();
+        return new Set(saved ? JSON.parse(saved) : []);
     });
     const [isTransitioning, setIsTransitioning] = useState(false);
+
+    // Add debug logging for completedQuestions changes
+    useEffect(() => {
+        console.log('CompletedQuestions updated:', Array.from(completedQuestions));
+        localStorage.setItem('completed_questions',
+            JSON.stringify(Array.from(completedQuestions))
+        );
+    }, [completedQuestions]);
 
     // Add effect for countdown
     useEffect(() => {
@@ -93,34 +101,67 @@ const Play = ({ teams, setTeams }) => {
     }, [teams, turnHistory]);
 
     const handleCategoryClick = (categoryId) => {
-        if (!selectedCategories.includes(categoryId)) {
-            const category = categoriesData.categories.find(c => c.id === categoryId);
-            setCurrentQuestion(category.questions[0]);
-            setQuestionIndex(0);
+        const category = categoriesData.categories.find(c => c.id === categoryId);
+        console.log('Category clicked:', category.name);
+        console.log('Current completed questions:', Array.from(completedQuestions));
 
+        // Find first unanswered question in this category
+        const firstUnansweredIndex = category.questions.findIndex(question => {
+            const isComplete = completedQuestions.has(question.id);
+            console.log(`Question ${question.id}: ${isComplete ? 'complete' : 'incomplete'}`);
+            return !isComplete;
+        });
+
+        console.log('First unanswered question index:', firstUnansweredIndex);
+
+        // If all questions are complete, category is unclickable
+        if (firstUnansweredIndex === -1) {
+            console.log('Category is complete, ignoring click');
+            return;
+        }
+
+        // Set current question to first unanswered question
+        setCurrentQuestion(category.questions[firstUnansweredIndex]);
+        setQuestionIndex(firstUnansweredIndex);
+        console.log('Setting current question to:', category.questions[firstUnansweredIndex].id);
+
+        // Add to selected categories if not already there
+        if (!selectedCategories.includes(categoryId)) {
             const newSelected = [...selectedCategories, categoryId];
             setSelectedCategories(newSelected);
             localStorage.setItem('selected_categories', JSON.stringify(newSelected));
-
-            // Record the turn in history
-            const newHistory = [...turnHistory, selectingTeam.id];
-            setTurnHistory(newHistory);
-            localStorage.setItem('turn_history', JSON.stringify(newHistory));
         }
     };
 
     const handleQuestionComplete = () => {
-        if (isTransitioning) return; // Prevent multiple transitions
+        if (isTransitioning) return;
+
+        console.log('Completing question:', currentQuestion.id);
+
+        // Mark current question as completed
+        const newCompletedQuestions = new Set(completedQuestions);
+        newCompletedQuestions.add(currentQuestion.id);
+        console.log('New completed questions:', Array.from(newCompletedQuestions));
+        setCompletedQuestions(newCompletedQuestions);
 
         const currentCategory = categoriesData.categories.find(
             c => c.questions.includes(currentQuestion)
         );
-        const nextIndex = questionIndex + 1;
 
-        // Mark current question as completed
-        const newCompletedQuestions = new Set([...completedQuestions, currentQuestion.id]);
-        setCompletedQuestions(newCompletedQuestions);
-        localStorage.setItem('completed_questions', JSON.stringify([...newCompletedQuestions]));
+        // Log category completion status
+        const isCategoryComplete = currentCategory.questions.every(question =>
+            newCompletedQuestions.has(question.id)
+        );
+        console.log('Category status:', {
+            name: currentCategory.name,
+            complete: isCategoryComplete,
+            totalQuestions: currentCategory.questions.length,
+            completedQuestions: currentCategory.questions.filter(q =>
+                newCompletedQuestions.has(q.id)
+            ).length
+        });
+
+        const nextIndex = questionIndex + 1;
 
         if (nextIndex < currentCategory.questions.length) {
             // Continue to next question in category
@@ -129,38 +170,20 @@ const Play = ({ teams, setTeams }) => {
                 setCurrentQuestion(currentCategory.questions[nextIndex]);
                 setQuestionIndex(nextIndex);
                 setIsTransitioning(false);
-            }, 300); // Short delay for transition
+            }, 300);
         } else {
-            // Check if all questions in category are completed
-            const allCategoryQuestionsComplete = currentCategory.questions.every(
-                question => newCompletedQuestions.has(question.id)
-            );
+            // Show transition and return to category selection
+            setIsTransitioning(true);
+            setShowingTransitionLeaderboard(true);
+            setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
 
-            if (allCategoryQuestionsComplete) {
-                // Category is complete - show transition
-                setIsTransitioning(true);
-                setShowingTransitionLeaderboard(true);
+            setTimeout(() => {
+                setShowingTransitionLeaderboard(false);
+                setCurrentQuestion(null);
+                setQuestionIndex(0);
                 setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
-
-                setTimeout(() => {
-                    setShowingTransitionLeaderboard(false);
-                    setCurrentQuestion(null);
-                    setQuestionIndex(0);
-                    setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
-                    setIsTransitioning(false);
-                }, LEADERBOARD_TRANSITION_TIME);
-            } else {
-                // Go back to first incomplete question
-                setIsTransitioning(true);
-                setTimeout(() => {
-                    const firstIncompleteIndex = currentCategory.questions.findIndex(
-                        question => !newCompletedQuestions.has(question.id)
-                    );
-                    setCurrentQuestion(currentCategory.questions[firstIncompleteIndex]);
-                    setQuestionIndex(firstIncompleteIndex);
-                    setIsTransitioning(false);
-                }, 300);
-            }
+                setIsTransitioning(false);
+            }, LEADERBOARD_TRANSITION_TIME);
         }
     };
 
@@ -207,64 +230,6 @@ const Play = ({ teams, setTeams }) => {
         null;
 
     const renderCategories = () => {
-        if (currentQuestion) {
-            return (
-                <Box sx={{ mb: 4 }}>
-                    <Paper
-                        elevation={3}
-                        sx={{
-                            p: 2,
-                            backgroundColor: 'grey.50',
-                            position: 'relative'
-                        }}
-                    >
-                        <Typography variant="h6" gutterBottom>
-                            Current Category
-                        </Typography>
-                        <Box sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 2,
-                            mb: 2
-                        }}>
-                            <Typography
-                                sx={{
-                                    fontSize: '2rem',
-                                    lineHeight: 1
-                                }}
-                            >
-                                {currentCategory.emoji}
-                            </Typography>
-                            <Typography variant="h5">
-                                {currentCategory.name}
-                            </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {categoriesData.categories.map((category) => {
-                                const isSelected = selectedCategories.includes(category.id);
-                                const isCurrent = category.id === currentCategory.id;
-                                return (
-                                    <Chip
-                                        key={category.id}
-                                        label={category.name}
-                                        icon={<Typography sx={{ fontSize: '1.2rem', pl: 1 }}>{category.emoji}</Typography>}
-                                        variant={isCurrent ? "filled" : "outlined"}
-                                        color={isCurrent ? "primary" : "default"}
-                                        sx={{
-                                            opacity: isSelected && !isCurrent ? 0.5 : 1,
-                                            '& .MuiChip-icon': {
-                                                marginLeft: 0
-                                            }
-                                        }}
-                                    />
-                                );
-                            })}
-                        </Box>
-                    </Paper>
-                </Box>
-            );
-        }
-
         return (
             <>
                 <Box sx={{
@@ -320,20 +285,6 @@ const Play = ({ teams, setTeams }) => {
                                 <Typography variant="subtitle1">
                                     {selectingTeam.emoji} <strong style={{ color: selectingTeam.color }}>{selectingTeam.name}</strong> selects next
                                 </Typography>
-                                {turnHistory.length > 0 && (
-                                    <Typography
-                                        variant="caption"
-                                        sx={{
-                                            ml: 2,
-                                            color: 'text.secondary',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.5
-                                        }}
-                                    >
-                                        Last pick: {teams.find(t => t.id === turnHistory[turnHistory.length - 1])?.name}
-                                    </Typography>
-                                )}
                             </Paper>
                         </Slide>
                     )}
@@ -341,70 +292,89 @@ const Play = ({ teams, setTeams }) => {
 
                 <Grid container spacing={3}>
                     {categoriesData.categories.map((category, index) => {
-                        const isSelected = selectedCategories.includes(category.id);
+                        const isCategoryComplete = category.questions.every(question => {
+                            const isComplete = completedQuestions.has(question.id);
+                            console.log(`Category ${category.name}, Question ${question.id}: ${isComplete ? 'complete' : 'incomplete'}`);
+                            return isComplete;
+                        });
+
+                        console.log(`Category ${category.name} completion status:`, isCategoryComplete);
+
                         return (
                             <Grid item xs={12} sm={6} md={4} key={category.id}>
-                                <Zoom in={true} style={{ transitionDelay: `${index * 100}ms` }}>
-                                    <Card
-                                        sx={{
-                                            cursor: isSelected ? 'default' : 'pointer',
-                                            opacity: isSelected ? 0.6 : 1,
-                                            transition: 'all 0.3s ease',
-                                            '&:hover': {
-                                                transform: isSelected ? 'none' : 'translateY(-4px)',
-                                                boxShadow: isSelected ? 1 : 4
-                                            },
-                                            height: '100%',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            justifyContent: 'center',
-                                            position: 'relative',
-                                            overflow: 'hidden',
-                                            border: !isSelected && selectingTeam ? `2px solid ${selectingTeam.color}` : 'none'
-                                        }}
-                                        onClick={() => !isSelected && handleCategoryClick(category.id)}
-                                        onMouseEnter={() => setHoveredCategory(category.id)}
-                                        onMouseLeave={() => setHoveredCategory(null)}
-                                    >
-                                        <CardContent sx={{
-                                            textAlign: 'center',
-                                            py: 4,
-                                        }}>
-                                            <Typography
+                                <Card
+                                    sx={{
+                                        cursor: isCategoryComplete ? 'default' : 'pointer',
+                                        opacity: isCategoryComplete ? 0.7 : 1,
+                                        filter: isCategoryComplete ? 'grayscale(30%)' : 'none',
+                                        transition: 'all 0.3s ease',
+                                        height: '100%',
+                                        '&:hover': !isCategoryComplete && {
+                                            transform: 'translateY(-4px)',
+                                            boxShadow: 4
+                                        }
+                                    }}
+                                    onClick={() => !isCategoryComplete && handleCategoryClick(category.id)}
+                                    onMouseEnter={() => setHoveredCategory(category.id)}
+                                    onMouseLeave={() => setHoveredCategory(null)}
+                                >
+                                    <CardContent sx={{
+                                        textAlign: 'center',
+                                        py: 4,
+                                        position: 'relative'
+                                    }}>
+                                        <Typography
+                                            sx={{
+                                                fontSize: '2.5rem',
+                                                mb: 2,
+                                                transform: hoveredCategory === category.id ? 'scale(1.1)' : 'scale(1)',
+                                                transition: 'transform 0.3s ease'
+                                            }}
+                                        >
+                                            {category.emoji}
+                                        </Typography>
+                                        <Typography
+                                            variant="h6"
+                                            sx={{
+                                                mb: 1,
+                                                color: isCategoryComplete ? 'text.disabled' : 'text.primary'
+                                            }}
+                                        >
+                                            {category.name}
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                            sx={{ px: 2 }}
+                                        >
+                                            {category.description}
+                                        </Typography>
+                                        {isCategoryComplete && (
+                                            <Box
                                                 sx={{
-                                                    fontSize: '2.5rem',
-                                                    mb: 2,
-                                                    opacity: isSelected ? 0.5 : 1,
-                                                    transform: hoveredCategory === category.id ? 'scale(1.1)' : 'scale(1)',
-                                                    transition: 'transform 0.3s ease'
+                                                    position: 'absolute',
+                                                    top: 8,
+                                                    right: 8,
+                                                    px: 1.5,
+                                                    py: 0.5,
+                                                    borderRadius: 8,
+                                                    backgroundColor: 'success.lighter',
+                                                    border: '1px solid success.light'
                                                 }}
                                             >
-                                                {category.emoji}
-                                            </Typography>
-                                            <Typography
-                                                variant="h6"
-                                                sx={{
-                                                    color: isSelected ? 'text.disabled' : 'text.primary',
-                                                    mb: 1
-                                                }}
-                                            >
-                                                {category.name}
-                                            </Typography>
-                                            <Collapse in={hoveredCategory === category.id}>
                                                 <Typography
-                                                    variant="body2"
-                                                    color="text.secondary"
+                                                    variant="caption"
                                                     sx={{
-                                                        opacity: isSelected ? 0.7 : 1,
-                                                        px: 2
+                                                        color: 'success.dark',
+                                                        fontWeight: 'medium'
                                                     }}
                                                 >
-                                                    {category.description}
+                                                    Complete
                                                 </Typography>
-                                            </Collapse>
-                                        </CardContent>
-                                    </Card>
-                                </Zoom>
+                                            </Box>
+                                        )}
+                                    </CardContent>
+                                </Card>
                             </Grid>
                         );
                     })}

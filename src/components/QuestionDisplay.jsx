@@ -146,6 +146,22 @@ const QuestionDisplay = ({
         ));
     };
 
+    const handleNextQuestion = () => {
+        // Only proceed if question is complete
+        if (!isQuestionComplete()) return;
+
+        // Call onQuestionComplete to mark current question as complete
+        onQuestionComplete();
+    };
+
+    const handleBackToCategories = () => {
+        // Only proceed if we're on the last question and it's complete
+        if (!allQuestionsComplete() || currentQuestionNumber !== totalQuestions) return;
+
+        // Call onQuestionComplete to mark current question as complete
+        onQuestionComplete();
+    };
+
     return (
         <Box sx={{ p: { xs: 2, md: 1 } }}>
             {/* Question Progress and Text in a row */}
@@ -537,7 +553,7 @@ const QuestionDisplay = ({
             }}>
                 <Button
                     variant="contained"
-                    onClick={onBackToCategories}
+                    onClick={handleBackToCategories}
                     disabled={!allQuestionsComplete() || currentQuestionNumber !== totalQuestions}
                     sx={{
                         opacity: allQuestionsComplete() && currentQuestionNumber === totalQuestions ? 1 : 0.5,
@@ -553,7 +569,7 @@ const QuestionDisplay = ({
                 {currentQuestionNumber < totalQuestions && (
                     <Button
                         variant="contained"
-                        onClick={onQuestionComplete}
+                        onClick={handleNextQuestion}
                         disabled={!isQuestionComplete()}
                         sx={{
                             opacity: isQuestionComplete() ? 1 : 0.5,
