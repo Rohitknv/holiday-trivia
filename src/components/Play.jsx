@@ -299,7 +299,13 @@ const Play = ({ teams, setTeams }) => {
                     </Slide>
 
                     <Fade in={true}>
-                        <Typography variant="h5" sx={{ textAlign: 'center', mb: 2 }}>
+                        <Typography variant="h5" sx={{
+                            textAlign: 'center',
+                            mb: 2,
+                            fontWeight: 'bold',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em'
+                        }}>
                             Select Category
                         </Typography>
                     </Fade>
@@ -328,8 +334,15 @@ const Play = ({ teams, setTeams }) => {
                                         backgroundColor: selectingTeam.color,
                                     }}
                                 />
-                                <Typography variant="subtitle1">
-                                    {selectingTeam.emoji} <strong style={{ color: selectingTeam.color }}>{selectingTeam.name}</strong> selects next
+                                <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                                    {selectingTeam.emoji}{' '}
+                                    <strong style={{
+                                        color: selectingTeam.color,
+                                        fontSize: '1.1rem'
+                                    }}>
+                                        {selectingTeam.name}
+                                    </strong>
+                                    <em style={{ marginLeft: 8 }}>selects next</em>
                                 </Typography>
                             </Paper>
                         </Slide>
@@ -371,8 +384,8 @@ const Play = ({ teams, setTeams }) => {
                                     }}>
                                         <Typography
                                             sx={{
-                                                fontSize: '2.5rem',
-                                                mb: 2,
+                                                fontSize: '3rem',
+                                                mb: 3,
                                                 transform: hoveredCategory === category.id ? 'scale(1.1)' : 'scale(1)',
                                                 transition: 'transform 0.3s ease'
                                             }}
@@ -380,18 +393,22 @@ const Play = ({ teams, setTeams }) => {
                                             {category.emoji}
                                         </Typography>
                                         <Typography
-                                            variant="h6"
+                                            variant="h5"
                                             sx={{
-                                                mb: 1,
-                                                color: isCategoryComplete ? 'text.disabled' : 'text.primary'
+                                                mb: 2,
+                                                color: isCategoryComplete ? 'text.disabled' : 'text.primary',
+                                                fontWeight: 'bold'
                                             }}
                                         >
                                             {category.name}
                                         </Typography>
                                         <Typography
-                                            variant="body2"
+                                            variant="body1"
                                             color="text.secondary"
-                                            sx={{ px: 2 }}
+                                            sx={{
+                                                px: 2,
+                                                fontSize: '1.1rem'
+                                            }}
                                         >
                                             {category.description}
                                         </Typography>
@@ -440,7 +457,10 @@ const Play = ({ teams, setTeams }) => {
                             alignItems: 'center',
                             mb: 4
                         }}>
-                            <Typography variant="h4">
+                            <Typography variant="h4" sx={{
+                                fontWeight: 'bold',
+                                letterSpacing: '0.02em'
+                            }}>
                                 Category Complete!
                             </Typography>
                             <Button
@@ -472,7 +492,10 @@ const Play = ({ teams, setTeams }) => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 1,
-                                mb: 3
+                                mb: 3,
+                                fontWeight: 'bold',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em'
                             }}>
                                 <EmojiEventsIcon /> Current Standings
                             </Typography>

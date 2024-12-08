@@ -196,7 +196,10 @@ const QuestionDisplay = ({
                 justifyContent: 'space-between',
                 mb: 3
             }}>
-                <Typography variant="subtitle1">
+                <Typography variant="subtitle1" sx={{
+                    fontWeight: 'bold',
+                    fontSize: '1.1rem'
+                }}>
                     Question {currentQuestionNumber} of {totalQuestions}
                 </Typography>
 
@@ -210,7 +213,11 @@ const QuestionDisplay = ({
                         <Typography
                             variant="subtitle2"
                             color="error.main"
-                            sx={{ fontWeight: 'medium' }}
+                            sx={{
+                                fontWeight: 'bold',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em'
+                            }}
                         >
                             Knocked Out:
                         </Typography>
@@ -257,7 +264,8 @@ const QuestionDisplay = ({
                     sx={{
                         fontWeight: 700,
                         color: 'text.primary',
-                        lineHeight: 1.3
+                        lineHeight: 1.4,
+                        letterSpacing: '0.01em'
                     }}
                 >
                     {question.text}
@@ -313,7 +321,9 @@ const QuestionDisplay = ({
                     sx={{
                         mb: 1,
                         fontWeight: 'bold',
-                        fontSize: '1.1rem'
+                        fontSize: '1.2rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
                     }}
                 >
                     Bonus Points

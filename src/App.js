@@ -41,16 +41,17 @@ function App() {
     };
 
     return (
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
             <Box sx={{ width: '100%', mb: 4, mt: 3 }}>
                 <Typography 
                     variant="h3" 
                     align="center" 
                     sx={{ 
-                        fontWeight: 'bold',
-                        mb: 4,  // Space between title and tabs
-                        color: 'primary.main',  // Use theme primary color
-                        textShadow: '2px 2px 4px rgba(0,0,0,0.1)'  // Subtle shadow
+                        fontWeight: 900,  // Extra bold
+                        mb: 4,
+                        color: 'primary.main',
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+                        letterSpacing: '0.02em'  // Slightly spaced letters
                     }}
                 >
                     GIR Holiday Trivia
@@ -61,7 +62,13 @@ function App() {
                         value={currentTab}
                         onChange={handleTabChange}
                         centered
-                        sx={{ mb: 3 }}
+                        sx={{ 
+                            mb: 3,
+                            '& .MuiTab-root': {
+                                fontSize: '1.1rem',
+                                fontWeight: 'bold'
+                            }
+                        }}
                     >
                         <Tab label="Teams" />
                         <Tab label="Play" disabled={teams.length < 2} />
