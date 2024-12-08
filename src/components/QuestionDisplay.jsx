@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Button, Grid, Card, CardContent, Fade, Slide, Chip } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 // Animation keyframes
 const correctAnswerBounce = keyframes`
@@ -33,6 +34,7 @@ const QuestionDisplay = ({
     const [teamOrder, setTeamOrder] = useState([]);
     const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
     const [knockedOutTeams, setKnockedOutTeams] = useState(new Set());
+    const [bonusPoints, setBonusPoints] = useState({});
 
     // Reset state including knocked out teams when question changes
     useEffect(() => {
@@ -41,6 +43,7 @@ const QuestionDisplay = ({
         setCurrentTeamIndex(0);
         setSelectedAnswers([]);
         setKnockedOutTeams(new Set());
+        setBonusPoints({});
     }, [question.id]);
 
     const currentTeam = teamOrder[currentTeamIndex];
@@ -123,6 +126,21 @@ const QuestionDisplay = ({
             .every(a => selectedAnswers.some(sa => sa.answerId === a.id));
 
         return allTeamsKnockedOut || allCorrectAnswersFound;
+    };
+
+    const handleAddBonusPoint = (teamId) => {
+        // Update bonus points display for current question
+        setBonusPoints(prev => ({
+            ...prev,
+            [teamId]: (prev[teamId] || 0) + 1
+        }));
+
+        // Update actual team score (this persists)
+        setTeams(prev => prev.map(team =>
+            team.id === teamId
+                ? { ...team, score: team.score + 1 }
+                : team
+        ));
     };
 
     return (
@@ -225,7 +243,7 @@ const QuestionDisplay = ({
                                         transition: 'all 0.3s ease'
                                     }}
                                 >
-                                    <span style={{ fontSize: '1.2em' }}>{currentTeam.emoji}</span>
+                                    <span style={{ fontSize: '1.4em' }}>{currentTeam.emoji}</span>
                                     <strong style={{ color: currentTeam.color }}>
                                         {currentTeam.name}
                                     </strong>
@@ -236,6 +254,82 @@ const QuestionDisplay = ({
                     </Fade>
                 </Box>
             )}
+
+            {/* Bonus Points Section */}
+            <Paper
+                elevation={2}
+                sx={{
+                    p: 2,
+                    mb: 3,
+                    backgroundColor: 'grey.50'
+                }}
+            >
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    Bonus Points
+                </Typography>
+                <Box sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 1
+                }}>
+                    {teamOrder.map(team => (
+                        <Box
+                            key={team.id}
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                backgroundColor: `${team.color}15`,
+                                border: `1px solid ${team.color}40`,
+                                borderRadius: 16,
+                                px: 1.5,
+                                py: 0.5,
+                                gap: 1
+                            }}
+                        >
+                            <span style={{ fontSize: '1.4em' }}>{team.emoji}</span>
+                            <Box
+                                component="button"
+                                onClick={() => handleAddBonusPoint(team.id)}
+                                sx={{
+                                    border: 'none',
+                                    backgroundColor: 'transparent',
+                                    cursor: 'pointer',
+                                    padding: 0.5,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    borderRadius: '50%',
+                                    transition: 'all 0.2s ease',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255,255,255,0.5)',
+                                    },
+                                    '&:active': {
+                                        transform: 'scale(0.95)',
+                                    }
+                                }}
+                            >
+                                <AddCircleIcon
+                                    sx={{
+                                        color: team.color,
+                                        fontSize: '1.2rem'
+                                    }}
+                                />
+                            </Box>
+                            {(bonusPoints[team.id] || 0) > 0 && (
+                                <Typography
+                                    sx={{
+                                        color: team.color,
+                                        fontWeight: 'bold',
+                                        fontSize: '0.9rem',
+                                        ml: 0.5
+                                    }}
+                                >
+                                    +{bonusPoints[team.id]}
+                                </Typography>
+                            )}
+                        </Box>
+                    ))}
+                </Box>
+            </Paper>
 
             {/* Answers Grid - reduced spacing */}
             <Grid container spacing={1.5} sx={{ mb: 3 }}>
@@ -388,7 +482,7 @@ const QuestionDisplay = ({
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    fontSize: '1.2em',
+                                                    fontSize: '1.4em',
                                                     position: 'relative',
                                                     boxShadow: 1
                                                 }}
