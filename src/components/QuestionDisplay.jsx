@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Button, Grid, Card, CardContent, Fade, Slide, Chip } from '@mui/material';
+import { Box, Typography, Paper, Button, Grid, Card, CardContent, Fade, Slide, Chip, CircularProgress } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
@@ -30,7 +30,8 @@ const QuestionDisplay = ({
     onQuestionComplete,
     currentQuestionNumber,
     totalQuestions,
-    onBackToCategories
+    onBackToCategories,
+    isTransitioning
 }) => {
     // Track selected answers and team order
     const [selectedAnswers, setSelectedAnswers] = useState([]);
@@ -38,6 +39,8 @@ const QuestionDisplay = ({
     const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
     const [knockedOutTeams, setKnockedOutTeams] = useState(new Set());
     const [bonusPoints, setBonusPoints] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [isProcessingAnswer, setIsProcessingAnswer] = useState(false);
 
     // Reset state including knocked out teams when question changes
     useEffect(() => {
@@ -49,38 +52,58 @@ const QuestionDisplay = ({
         setBonusPoints({});
     }, [question.id]);
 
+    // Add effect to handle loading state
+    useEffect(() => {
+        setIsLoading(true);
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 100); // Short delay to prevent flash
+        return () => clearTimeout(timer);
+    }, [question.id]);
+
     const currentTeam = teamOrder[currentTeamIndex];
 
     const handleAnswerSelect = (answer) => {
-        // Prevent selection if answer is already selected
-        if (selectedAnswers.some(sa => sa.answerId === answer.id)) {
+        // Prevent rapid clicks and double selections
+        if (isProcessingAnswer || selectedAnswers.some(sa => sa.answerId === answer.id)) {
             return;
         }
 
-        // Record the selection
-        const selection = {
-            teamId: currentTeam.id,
-            answerId: answer.id,
-            isCorrect: answer.isCorrect
-        };
-        setSelectedAnswers(prev => [...prev, selection]);
+        setIsProcessingAnswer(true);
 
-        if (answer.isCorrect) {
-            // Update team score
-            setTeams(prev => prev.map(team =>
-                team.id === currentTeam.id
-                    ? { ...team, score: team.score + answer.points }
-                    : team
-            ));
-        } else {
-            // Knock out current team
-            setKnockedOutTeams(prev => new Set([...prev, currentTeam.id]));
-        }
+        try {
+            // Record the selection
+            const selection = {
+                teamId: currentTeam.id,
+                answerId: answer.id,
+                isCorrect: answer.isCorrect
+            };
+            setSelectedAnswers(prev => [...prev, selection]);
 
-        // Always move to next available team
-        const nextTeam = findNextAvailableTeam(currentTeamIndex);
-        if (nextTeam !== -1) {
-            setCurrentTeamIndex(nextTeam);
+            if (answer.isCorrect) {
+                // Update team score
+                setTeams(prev => prev.map(team =>
+                    team.id === currentTeam.id
+                        ? { ...team, score: team.score + answer.points }
+                        : team
+                ));
+            } else {
+                // Knock out current team
+                setKnockedOutTeams(prev => new Set([...prev, currentTeam.id]));
+            }
+
+            // Always move to next available team
+            const nextTeam = findNextAvailableTeam(currentTeamIndex);
+            if (nextTeam !== -1) {
+                setCurrentTeamIndex(nextTeam);
+            }
+        } catch (error) {
+            console.error('Error processing answer:', error);
+        } finally {
+            // Release the lock after a short delay
+            setTimeout(() => {
+                setIsProcessingAnswer(false);
+            }, 300);
         }
     };
 
@@ -147,25 +170,22 @@ const QuestionDisplay = ({
     };
 
     const handleNextQuestion = () => {
-        // Only proceed if question is complete
-        if (!isQuestionComplete()) return;
-
-        // Call onQuestionComplete to mark current question as complete
+        if (isProcessingAnswer || !isQuestionComplete() || isTransitioning) return;
         onQuestionComplete();
     };
 
     const handleBackToCategories = () => {
-        // Only proceed if we're on the last question and it's complete
-        if (!allQuestionsComplete() || currentQuestionNumber !== totalQuestions) return;
-
-        // First mark the question as complete
+        if (isProcessingAnswer || !allQuestionsComplete() || currentQuestionNumber !== totalQuestions || isTransitioning) return;
         onQuestionComplete();
-
-        // Then wait a short moment to ensure state is updated before transitioning
-        setTimeout(() => {
-            onBackToCategories();
-        }, 50);
+        onBackToCategories();
     };
+
+    // Add cleanup effect
+    useEffect(() => {
+        return () => {
+            setIsProcessingAnswer(false);
+        };
+    }, []);
 
     return (
         <Box sx={{ p: { xs: 2, md: 1 } }}>
@@ -384,29 +404,31 @@ const QuestionDisplay = ({
                                     cursor: isSelected ? 'default' : 'pointer',
                                     transition: 'all 0.2s ease',
                                     position: 'relative',
-                                    backgroundColor: isSelected ? (
-                                        isCorrectSelection
-                                            ? alpha('#4caf50', 0.1)  // Light green background
-                                            : alpha('#f44336', 0.1)  // Light red background
-                                    ) : (
-                                        // Show all answers' correctness when question is complete
-                                        isQuestionComplete()
-                                            ? (answer.isCorrect
-                                                ? alpha('#4caf50', 0.1)  // Light green for correct
-                                                : alpha('#f44336', 0.1))  // Light red for incorrect
-                                            : 'background.paper'
+                                    backgroundColor: isLoading ? 'background.paper' : (
+                                        isSelected ? (
+                                            isCorrectSelection
+                                                ? alpha('#4caf50', 0.1)
+                                                : alpha('#f44336', 0.1)
+                                        ) : (
+                                            isQuestionComplete()
+                                                ? (answer.isCorrect
+                                                    ? alpha('#4caf50', 0.1)
+                                                    : alpha('#f44336', 0.1))
+                                                : 'background.paper'
+                                        )
                                     ),
-                                    borderLeft: isSelected ? (
-                                        isCorrectSelection
-                                            ? '4px solid #4caf50'    // Solid green border
-                                            : '4px solid #f44336'    // Solid red border
-                                    ) : (
-                                        // Show all answers' borders when question is complete
-                                        isQuestionComplete()
-                                            ? (answer.isCorrect
-                                                ? '4px solid #4caf50'  // Green border for correct
-                                                : '4px solid #f44336')  // Red border for incorrect
-                                            : 'none'
+                                    borderLeft: isLoading ? 'none' : (
+                                        isSelected ? (
+                                            isCorrectSelection
+                                                ? '4px solid #4caf50'
+                                                : '4px solid #f44336'
+                                        ) : (
+                                            isQuestionComplete()
+                                                ? (answer.isCorrect
+                                                    ? '4px solid #4caf50'
+                                                    : '4px solid #f44336')
+                                                : 'none'
+                                        )
                                     ),
                                     '&:hover': (!isSelected && !isQuestionComplete()) && {
                                         transform: 'translateY(-4px)',
@@ -423,7 +445,7 @@ const QuestionDisplay = ({
                                             : `${incorrectAnswerAnimation} 0.6s ease-in-out`
                                     ) : 'none',
                                 }}
-                                onClick={() => !isSelected && handleAnswerSelect(answer)}
+                                onClick={() => !isSelected && !isProcessingAnswer && !isTransitioning && handleAnswerSelect(answer)}
                             >
                                 {/* Answer Number Badge */}
                                 <Box
@@ -566,32 +588,62 @@ const QuestionDisplay = ({
                 <Button
                     variant="contained"
                     onClick={handleBackToCategories}
-                    disabled={!allQuestionsComplete() || currentQuestionNumber !== totalQuestions}
+                    disabled={!allQuestionsComplete() || currentQuestionNumber !== totalQuestions || isTransitioning}
                     sx={{
-                        opacity: allQuestionsComplete() && currentQuestionNumber === totalQuestions ? 1 : 0.5,
+                        opacity: (allQuestionsComplete() && currentQuestionNumber === totalQuestions && !isTransitioning) ? 1 : 0.5,
                         '&.Mui-disabled': {
                             backgroundColor: 'grey.300',
                             color: 'grey.500'
-                        }
+                        },
+                        minWidth: 180,  // Add space for spinner
+                        position: 'relative'  // For spinner positioning
                     }}
                 >
-                    Back to Categories
+                    {isTransitioning ? (
+                        <>
+                            <CircularProgress
+                                size={24}
+                                sx={{
+                                    position: 'absolute',
+                                    left: 16
+                                }}
+                            />
+                            Processing...
+                        </>
+                    ) : (
+                        'Back to Categories'
+                    )}
                 </Button>
 
                 {currentQuestionNumber < totalQuestions && (
                     <Button
                         variant="contained"
                         onClick={handleNextQuestion}
-                        disabled={!isQuestionComplete()}
+                        disabled={!isQuestionComplete() || isTransitioning}
                         sx={{
-                            opacity: isQuestionComplete() ? 1 : 0.5,
+                            opacity: (isQuestionComplete() && !isTransitioning) ? 1 : 0.5,
                             '&.Mui-disabled': {
                                 backgroundColor: 'grey.300',
                                 color: 'grey.500'
-                            }
+                            },
+                            minWidth: 160,  // Add space for spinner
+                            position: 'relative'  // For spinner positioning
                         }}
                     >
-                        Next Question
+                        {isTransitioning ? (
+                            <>
+                                <CircularProgress
+                                    size={24}
+                                    sx={{
+                                        position: 'absolute',
+                                        left: 16
+                                    }}
+                                />
+                                Processing...
+                            </>
+                        ) : (
+                            'Next Question'
+                        )}
                     </Button>
                 )}
             </Box>

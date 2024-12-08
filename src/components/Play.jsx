@@ -55,6 +55,8 @@ const Play = ({ teams, setTeams }) => {
         return new Set(saved ? JSON.parse(saved) : []);
     });
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [pendingTransition, setPendingTransition] = useState(null);
+    const [transitionTimers, setTransitionTimers] = useState({ main: null, secondary: null });
 
     // Add debug logging for completedQuestions changes
     useEffect(() => {
@@ -73,6 +75,65 @@ const Play = ({ teams, setTeams }) => {
             return () => clearInterval(timer);
         }
     }, [showingTransitionLeaderboard, transitionTimeRemaining]);
+
+    // Add this effect to handle transitions
+    useEffect(() => {
+        if (!pendingTransition) return;
+
+        const { type, data } = pendingTransition;
+
+        // Clear any existing timers
+        if (transitionTimers.main) clearTimeout(transitionTimers.main);
+        if (transitionTimers.secondary) clearTimeout(transitionTimers.secondary);
+
+        setIsTransitioning(true);
+
+        // Add error boundary
+        try {
+            if (type === 'NEXT_QUESTION') {
+                const mainTimer = setTimeout(() => {
+                    setCurrentQuestion(data.nextQuestion);
+                    setQuestionIndex(data.nextIndex);
+                    setIsTransitioning(false);
+                    setPendingTransition(null);
+                }, 50);
+
+                setTransitionTimers({ main: mainTimer, secondary: null });
+            }
+            else if (type === 'BACK_TO_CATEGORIES') {
+                const mainTimer = setTimeout(() => {
+                    setShowingTransitionLeaderboard(true);
+                    setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+
+                    const secondaryTimer = setTimeout(() => {
+                        setShowingTransitionLeaderboard(false);
+                        setCurrentQuestion(null);
+                        setQuestionIndex(0);
+                        setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+                        setIsTransitioning(false);
+                        setPendingTransition(null);
+                    }, LEADERBOARD_TRANSITION_TIME);
+
+                    setTransitionTimers(prev => ({ ...prev, secondary: secondaryTimer }));
+                }, 50);
+
+                setTransitionTimers({ main: mainTimer, secondary: null });
+            }
+        } catch (error) {
+            console.error('Error during transition:', error);
+            // Reset state on error
+            setIsTransitioning(false);
+            setPendingTransition(null);
+            setTransitionTimers({ main: null, secondary: null });
+        }
+
+        return () => {
+            if (transitionTimers.main) clearTimeout(transitionTimers.main);
+            if (transitionTimers.secondary) clearTimeout(transitionTimers.secondary);
+            setIsTransitioning(false);
+            setPendingTransition(null);
+        };
+    }, [pendingTransition]);
 
     // Enhanced team selection logic with tiebreakers
     const selectingTeam = useMemo(() => {
@@ -136,54 +197,29 @@ const Play = ({ teams, setTeams }) => {
     const handleQuestionComplete = () => {
         if (isTransitioning) return;
 
-        console.log('Completing question:', currentQuestion.id);
-
-        // Mark current question as completed
+        // Update completed questions immediately
         const newCompletedQuestions = new Set(completedQuestions);
         newCompletedQuestions.add(currentQuestion.id);
-        console.log('New completed questions:', Array.from(newCompletedQuestions));
         setCompletedQuestions(newCompletedQuestions);
+        localStorage.setItem('completed_questions', JSON.stringify(Array.from(newCompletedQuestions)));
 
         const currentCategory = categoriesData.categories.find(
             c => c.questions.includes(currentQuestion)
         );
-
-        // Log category completion status
-        const isCategoryComplete = currentCategory.questions.every(question =>
-            newCompletedQuestions.has(question.id)
-        );
-        console.log('Category status:', {
-            name: currentCategory.name,
-            complete: isCategoryComplete,
-            totalQuestions: currentCategory.questions.length,
-            completedQuestions: currentCategory.questions.filter(q =>
-                newCompletedQuestions.has(q.id)
-            ).length
-        });
-
         const nextIndex = questionIndex + 1;
 
         if (nextIndex < currentCategory.questions.length) {
-            // Continue to next question in category
-            setIsTransitioning(true);
-            setTimeout(() => {
-                setCurrentQuestion(currentCategory.questions[nextIndex]);
-                setQuestionIndex(nextIndex);
-                setIsTransitioning(false);
-            }, 300);
+            setPendingTransition({
+                type: 'NEXT_QUESTION',
+                data: {
+                    nextQuestion: currentCategory.questions[nextIndex],
+                    nextIndex
+                }
+            });
         } else {
-            // Show transition and return to category selection
-            setIsTransitioning(true);
-            setShowingTransitionLeaderboard(true);
-            setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
-
-            setTimeout(() => {
-                setShowingTransitionLeaderboard(false);
-                setCurrentQuestion(null);
-                setQuestionIndex(0);
-                setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
-                setIsTransitioning(false);
-            }, LEADERBOARD_TRANSITION_TIME);
+            setPendingTransition({
+                type: 'BACK_TO_CATEGORIES'
+            });
         }
     };
 
@@ -203,31 +239,36 @@ const Play = ({ teams, setTeams }) => {
     };
 
     const handleSkipTransition = () => {
+        // Clear any existing timers
+        if (transitionTimers.main) clearTimeout(transitionTimers.main);
+        if (transitionTimers.secondary) clearTimeout(transitionTimers.secondary);
+
+        // Reset all transition-related state
         setShowingTransitionLeaderboard(false);
         setCurrentQuestion(null);
         setQuestionIndex(0);
         setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+        setIsTransitioning(false);
+        setPendingTransition(null);
+        setTransitionTimers({ main: null, secondary: null });
     };
 
     const handleBackToCategories = () => {
         if (isTransitioning) return;
 
-        // Set transitioning state first
-        setIsTransitioning(true);
+        // Clear any existing timers first
+        if (transitionTimers.main) clearTimeout(transitionTimers.main);
+        if (transitionTimers.secondary) clearTimeout(transitionTimers.secondary);
 
-        // Wait for state updates to complete before showing transition
-        setTimeout(() => {
-            setShowingTransitionLeaderboard(true);
-            setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+        // Update completed questions immediately
+        const newCompletedQuestions = new Set(completedQuestions);
+        newCompletedQuestions.add(currentQuestion.id);
+        setCompletedQuestions(newCompletedQuestions);
+        localStorage.setItem('completed_questions', JSON.stringify(Array.from(newCompletedQuestions)));
 
-            setTimeout(() => {
-                setShowingTransitionLeaderboard(false);
-                setCurrentQuestion(null);
-                setQuestionIndex(0);
-                setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
-                setIsTransitioning(false);
-            }, LEADERBOARD_TRANSITION_TIME);
-        }, 50);
+        setPendingTransition({
+            type: 'BACK_TO_CATEGORIES'
+        });
     };
 
     const currentCategory = currentQuestion ?
@@ -500,6 +541,7 @@ const Play = ({ teams, setTeams }) => {
                                 currentQuestionNumber={questionIndex + 1}
                                 totalQuestions={currentCategory.questions.length}
                                 onBackToCategories={handleBackToCategories}
+                                isTransitioning={isTransitioning}
                             />
                             <Box sx={{ mt: 4 }}>
                                 <Paper sx={{ p: 2, backgroundColor: 'grey.50' }}>
