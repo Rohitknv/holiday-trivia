@@ -42,7 +42,20 @@ function App() {
 
     return (
         <Container maxWidth="md">
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{ width: '100%', mb: 4, mt: 3 }}>
+                <Typography 
+                    variant="h3" 
+                    align="center" 
+                    sx={{ 
+                        fontWeight: 'bold',
+                        mb: 4,  // Space between title and tabs
+                        color: 'primary.main',  // Use theme primary color
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.1)'  // Subtle shadow
+                    }}
+                >
+                    GIR Holiday Trivia
+                </Typography>
+
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs
                         value={currentTab}
