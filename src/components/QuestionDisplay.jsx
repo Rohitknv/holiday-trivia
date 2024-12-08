@@ -4,20 +4,23 @@ import { alpha, keyframes } from '@mui/material/styles';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 // Animation keyframes
-const correctAnswerBounce = keyframes`
-    0%, 100% { transform: translateY(0); }
-    20% { transform: translateY(-10px); }
-    40% { transform: translateY(0); }
-    60% { transform: translateY(-5px); }
-    80% { transform: translateY(0); }
+const correctAnswerAnimation = keyframes`
+    0% { transform: scale(1); }
+    20% { transform: scale(1.1) rotate(2deg); }
+    40% { transform: scale(1) rotate(-2deg); }
+    60% { transform: scale(1.05) rotate(2deg); }
+    80% { transform: scale(1) rotate(-1deg); }
+    100% { transform: scale(1) rotate(0); }
 `;
 
-const incorrectAnswerShake = keyframes`
+const incorrectAnswerAnimation = keyframes`
     0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-10px); }
-    40% { transform: translateX(10px); }
-    60% { transform: translateX(-5px); }
-    80% { transform: translateX(5px); }
+    15% { transform: translateX(-8px) rotate(-1deg); }
+    30% { transform: translateX(8px) rotate(1deg); }
+    45% { transform: translateX(-6px) rotate(-0.5deg); }
+    60% { transform: translateX(6px) rotate(0.5deg); }
+    75% { transform: translateX(-4px) rotate(-0.25deg); }
+    90% { transform: translateX(4px) rotate(0.25deg); }
 `;
 
 const QuestionDisplay = ({
@@ -385,7 +388,12 @@ const QuestionDisplay = ({
                                     // Adjust content sizing for smaller cards
                                     '& .MuiCardContent-root': {
                                         p: { xs: 2, md: 2.5 }, // Responsive padding
-                                    }
+                                    },
+                                    animation: isSelected ? (
+                                        isCorrectSelection
+                                            ? `${correctAnswerAnimation} 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)`  // Bouncy easing
+                                            : `${incorrectAnswerAnimation} 0.6s ease-in-out`
+                                    ) : 'none',
                                 }}
                                 onClick={() => !isSelected && handleAnswerSelect(answer)}
                             >
