@@ -23,14 +23,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 const TEAM_COLORS = [
-    { name: 'Red', value: '#ef5350' },
-    { name: 'Purple', value: '#ab47bc' },
-    { name: 'Blue', value: '#42a5f5' },
-    { name: 'Teal', value: '#26a69a' },
-    { name: 'Green', value: '#66bb6a' },
-    { name: 'Orange', value: '#ffa726' },
-    { name: 'Deep Purple', value: '#7e57c2' },
-    { name: 'Cyan', value: '#26c6da' },
+    { name: 'Red', value: '#e53935' },
+    { name: 'Blue', value: '#1e88e5' },
+    { name: 'Green', value: '#43a047' },
+    { name: 'Purple', value: '#8e24aa' },
+    { name: 'Orange', value: '#fb8c00' },
+    { name: 'Teal', value: '#00897b' },
+    { name: 'Pink', value: '#d81b60' },
+    { name: 'Yellow', value: '#fdd835' },
 ];
 
 const TEAM_EMOJIS = [
