@@ -21,6 +21,8 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 const TEAM_COLORS = [
     { name: 'Red', value: '#e53935' },
@@ -193,9 +195,25 @@ const TeamSelector = ({ teams, setTeams }) => {
                                     <Box sx={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: 2,
+                                        gap: 1,
                                         flex: '1 1 200px'
                                     }}>
+                                        <IconButton
+                                            onClick={() => {
+                                                setTeams(prev => prev.map(t =>
+                                                    t.id === team.id ? { ...t, score: Math.max(0, t.score - 1) } : t
+                                                ));
+                                            }}
+                                            sx={{
+                                                color: team.color,
+                                                '&:hover': {
+                                                    backgroundColor: `${team.color}20`
+                                                }
+                                            }}
+                                        >
+                                            <RemoveCircleIcon />
+                                        </IconButton>
+
                                         <TextField
                                             size="small"
                                             type="number"
@@ -205,6 +223,22 @@ const TeamSelector = ({ teams, setTeams }) => {
                                             onBlur={() => handleScoreBlur(team)}
                                             sx={{ width: '100px' }}
                                         />
+
+                                        <IconButton
+                                            onClick={() => {
+                                                setTeams(prev => prev.map(t =>
+                                                    t.id === team.id ? { ...t, score: t.score + 1 } : t
+                                                ));
+                                            }}
+                                            sx={{
+                                                color: team.color,
+                                                '&:hover': {
+                                                    backgroundColor: `${team.color}20`
+                                                }
+                                            }}
+                                        >
+                                            <AddCircleIcon />
+                                        </IconButton>
                                     </Box>
 
                                     <Box sx={{ display: 'flex', gap: 1 }}>

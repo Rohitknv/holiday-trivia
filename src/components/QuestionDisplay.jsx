@@ -158,8 +158,13 @@ const QuestionDisplay = ({
         // Only proceed if we're on the last question and it's complete
         if (!allQuestionsComplete() || currentQuestionNumber !== totalQuestions) return;
 
-        // Call onQuestionComplete to mark current question as complete
+        // First mark the question as complete
         onQuestionComplete();
+
+        // Then wait a short moment to ensure state is updated before transitioning
+        setTimeout(() => {
+            onBackToCategories();
+        }, 50);
     };
 
     return (

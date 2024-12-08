@@ -212,17 +212,22 @@ const Play = ({ teams, setTeams }) => {
     const handleBackToCategories = () => {
         if (isTransitioning) return;
 
+        // Set transitioning state first
         setIsTransitioning(true);
-        setShowingTransitionLeaderboard(true);
-        setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
 
+        // Wait for state updates to complete before showing transition
         setTimeout(() => {
-            setShowingTransitionLeaderboard(false);
-            setCurrentQuestion(null);
-            setQuestionIndex(0);
+            setShowingTransitionLeaderboard(true);
             setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
-            setIsTransitioning(false);
-        }, LEADERBOARD_TRANSITION_TIME);
+
+            setTimeout(() => {
+                setShowingTransitionLeaderboard(false);
+                setCurrentQuestion(null);
+                setQuestionIndex(0);
+                setTransitionTimeRemaining(LEADERBOARD_TRANSITION_TIME);
+                setIsTransitioning(false);
+            }, LEADERBOARD_TRANSITION_TIME);
+        }, 50);
     };
 
     const currentCategory = currentQuestion ?
