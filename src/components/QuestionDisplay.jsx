@@ -283,7 +283,14 @@ const QuestionDisplay = ({
                     backgroundColor: 'grey.50'
                 }}
             >
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                <Typography
+                    variant="subtitle1"
+                    sx={{
+                        mb: 1,
+                        fontWeight: 'bold',
+                        fontSize: '1.1rem'
+                    }}
+                >
                     Bonus Points
                 </Typography>
                 <Box sx={{
